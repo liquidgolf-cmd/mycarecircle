@@ -43,6 +43,7 @@ export default function Onboarding() {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [isStreaming, setIsStreaming] = useState(false)
+  const [voiceMode, setVoiceMode] = useState(false)
   const [recipientId, setRecipientId] = useState(null)
   const [extractedData, setExtractedData] = useState({
     recipient_name: null, age: null, city: null, state: null,
@@ -52,9 +53,13 @@ export default function Onboarding() {
   const inputRef = useRef(null)
   const recipientIdRef = useRef(null)
   const willowStarted = useRef(false)
+  const voiceModeRef = useRef(false)       // readable inside callbacks
+  const wasStreamingRef = useRef(false)    // track streaming transitions
   // StrictMode guard: prevents the double-invoked state-updater from firing
   // two concurrent POST /circle/create requests before the first resolves.
   const syncInProgressRef = useRef(false)
+
+  useEffect(() => { voiceModeRef.current = voiceMode }, [voiceMode])
 
   useEffect(() => { recipientIdRef.current = recipientId }, [recipientId])
 
@@ -96,9 +101,25 @@ export default function Onboarding() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  const { isListening, isSupported, startListening } = useVoiceInput((transcript) => {
-    setInput((prev) => prev + (prev ? ' ' : '') + transcript)
+  const { isListening, isSupported, startListening, stopListening } = useVoiceInput((transcript) => {
+    if (voiceModeRef.current) {
+      // Voice mode: auto-send immediately without requiring a button tap
+      sendMessage(transcript)
+    } else {
+      setInput((prev) => prev + (prev ? ' ' : '') + transcript)
+    }
   })
+
+  // Auto-restart mic after Willow finishes responding (voice mode only)
+  useEffect(() => {
+    if (wasStreamingRef.current && !isStreaming && voiceModeRef.current) {
+      const timer = setTimeout(() => {
+        if (voiceModeRef.current) startListening()
+      }, 800)
+      return () => clearTimeout(timer)
+    }
+    wasStreamingRef.current = isStreaming
+  }, [isStreaming, startListening])
 
   // signal is optional — only passed by the Willow init effect so StrictMode
   // can cancel the stale first-mount request before it shows an error toast.
@@ -224,14 +245,27 @@ export default function Onboarding() {
     } catch { /* silent */ }
   }
 
-  function handleSend() {
-    const text = input.trim()
+  function sendMessage(text) {
     if (!text || isStreaming) return
     const userMsg = { role: 'user', content: text }
     const history = [...messages.filter((m) => !m.streaming), userMsg]
     setMessages(history)
     setInput('')
     sendToWillow(history.map(({ role, content }) => ({ role, content })))
+  }
+
+  function handleSend() {
+    sendMessage(input.trim())
+  }
+
+  function toggleVoiceMode() {
+    if (voiceMode) {
+      stopListening()
+      setVoiceMode(false)
+    } else {
+      setVoiceMode(true)
+      startListening()
+    }
   }
 
   async function handleFinish() {
@@ -358,21 +392,60 @@ export default function Onboarding() {
       )}
 
       {/* Input bar — inline below messages, not fixed */}
-      <div className="bg-white border-t border-border px-3 py-3">
+      <div className="bg-white border-t border-border px-3 py-3 space-y-2">
+
+        {/* Voice mode status banner */}
+        {voiceMode && (
+          <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${
+            isListening
+              ? 'bg-rose/10 border border-rose/20'
+              : isStreaming
+              ? 'bg-sage/10 border border-sage/20'
+              : 'bg-cream border border-border'
+          }`}>
+            {isListening ? (
+              <>
+                <span className="flex gap-0.5 items-end h-4">
+                  <span className="w-1 bg-rose rounded-full animate-bounce" style={{ height: '60%', animationDelay: '0ms' }} />
+                  <span className="w-1 bg-rose rounded-full animate-bounce" style={{ height: '100%', animationDelay: '150ms' }} />
+                  <span className="w-1 bg-rose rounded-full animate-bounce" style={{ height: '60%', animationDelay: '300ms' }} />
+                </span>
+                <span className="text-xs font-medium text-rose">Listening… speak your answer</span>
+              </>
+            ) : isStreaming ? (
+              <>
+                <span className="flex gap-1 items-center">
+                  {[0, 150, 300].map((d) => (
+                    <span key={d} className="w-1.5 h-1.5 bg-sage rounded-full animate-bounce" style={{ animationDelay: `${d}ms` }} />
+                  ))}
+                </span>
+                <span className="text-xs font-medium text-sage">Willow is responding… mic will restart automatically</span>
+              </>
+            ) : (
+              <>
+                <Mic size={13} className="text-mid" />
+                <span className="text-xs text-mid">Voice mode on — mic restarts after each response</span>
+              </>
+            )}
+          </div>
+        )}
+
         <div className="flex items-end gap-2">
           <textarea
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
-            placeholder="Type your message…"
+            placeholder={voiceMode ? 'Speaking hands-free — or type here…' : 'Type your message…'}
             rows={1}
             disabled={isStreaming}
             className="flex-1 resize-none rounded-xl border border-border px-3 py-2.5 text-sm text-charcoal outline-none focus:ring-2 focus:ring-sage max-h-28"
           />
-          {isSupported && (
+
+          {/* Single-tap mic (non-voice-mode only) */}
+          {isSupported && !voiceMode && (
             <button
-              onClick={startListening}
+              onClick={isListening ? stopListening : startListening}
               disabled={isStreaming}
               aria-label="Voice input"
               className={`w-10 h-10 flex items-center justify-center rounded-xl transition-colors ${
@@ -382,6 +455,23 @@ export default function Onboarding() {
               {isListening ? <MicOff size={18} /> : <Mic size={18} />}
             </button>
           )}
+
+          {/* Voice mode toggle */}
+          {isSupported && (
+            <button
+              onClick={toggleVoiceMode}
+              title={voiceMode ? 'Stop voice mode' : 'Enable hands-free voice mode'}
+              className={`h-10 px-3 flex items-center gap-1.5 rounded-xl text-xs font-semibold transition-colors ${
+                voiceMode
+                  ? 'bg-rose text-white hover:bg-rose/80'
+                  : 'bg-sage/10 text-sage hover:bg-sage/20 border border-sage/30'
+              }`}
+            >
+              {voiceMode ? <MicOff size={15} /> : <Mic size={15} />}
+              {voiceMode ? 'Stop' : 'Hands-free'}
+            </button>
+          )}
+
           <button
             onClick={handleSend}
             disabled={!input.trim() || isStreaming}
