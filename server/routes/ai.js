@@ -19,7 +19,13 @@ Your goal is to collect the following through natural conversation:
 - Their city and state
 - Their current medications (name, dosage, frequency if known)
 - Their medical conditions and known allergies
-- The names of other family members who help with care
+- The names of EVERYONE who helps with care — family members, friends, neighbors, or anyone else involved
+
+HELPERS — REQUIRED QUESTION:
+You MUST ask "Who else helps you care for [name]?" before the conversation ends. This is not optional.
+- Capture every name the user mentions as a helper — family, friends, neighbors, hired helpers, anyone
+- If the user mentions a helper name anywhere in the conversation (e.g. "my sister Jane drives her to appointments"), add that name immediately
+- Capture first names, full names, or however the user refers to them
 
 DATA EXTRACTION — CRITICAL:
 After every single response you send, you MUST append an <extract> JSON block containing all data collected so far in the conversation. The app uses this block to save data to the database — it is never shown to the user, so never reference or describe it.
@@ -32,11 +38,11 @@ Rules for the <extract> block:
 - medications: array of strings, e.g. ["metformin 500mg twice daily", "lisinopril 10mg"]
 - conditions: array of strings, e.g. ["type 2 diabetes", "hypertension"]
 - allergies: array of strings, e.g. ["penicillin"]
-- family_members: array of strings (names only)
+- family_members: array of names of EVERYONE who helps with care — add a name the moment it is mentioned, never remove names already listed
 - Keep accumulating — never drop data that was mentioned earlier in the conversation
 
-Example after learning the recipient is named Margaret, has diabetes, and takes metformin:
-<extract>{"recipient_name":"Margaret","age":null,"city":null,"state":null,"medications":["metformin 500mg daily"],"conditions":["type 2 diabetes"],"allergies":[],"family_members":[]}</extract>
+Example after learning the recipient is Margaret, has diabetes, takes metformin, and her daughter Sarah and neighbor Tom help out:
+<extract>{"recipient_name":"Margaret","age":null,"city":null,"state":null,"medications":["metformin 500mg daily"],"conditions":["type 2 diabetes"],"allergies":[],"family_members":["Sarah","Tom"]}</extract>
 
 When you have recipient_name plus at least one other detail, offer to finish setup. The user can also say they're done at any time.
 
@@ -117,7 +123,7 @@ Rules:
 - medications: array of strings like "metformin 500mg twice daily"
 - conditions: array of strings like "type 2 diabetes"
 - allergies: array of strings like "penicillin"
-- family_members: array of name strings of other caregivers
+- family_members: array of name strings of everyone who helps with care (family, friends, neighbors, anyone mentioned)
 
 Conversation:
 ${conversationText}`,
