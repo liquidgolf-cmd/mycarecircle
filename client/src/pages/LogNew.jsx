@@ -34,15 +34,21 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
   const [severity, setSeverity] = useState(existingEntry?.severity || 'normal')
   const [saving, setSaving] = useState(false)
 
-  const { isListening, isSupported, startListening, stopListening, permissionDenied } = useVoiceInput((transcript) => {
+  const { isListening, isSupported, startListening, stopListening, permissionDenied, noSpeechDetected } = useVoiceInput((transcript) => {
     setBody((prev) => prev + (prev ? ' ' : '') + transcript)
   })
 
   useEffect(() => {
     if (permissionDenied) {
-      toast.error('Microphone access denied. Please allow microphone access in your browser settings.')
+      toast.error('Microphone access denied — allow it in your browser settings and try again.')
     }
   }, [permissionDenied])
+
+  useEffect(() => {
+    if (noSpeechDetected) {
+      toast('No speech detected — tap the mic and speak clearly.', { icon: '🎤' })
+    }
+  }, [noSpeechDetected])
 
   function handleDocumentScanned(extracted) {
     if (extracted.body)     setBody(extracted.body)
@@ -123,7 +129,9 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
             placeholder="What's happening with your loved one today?"
             maxLength={2000}
             rows={5}
-            className="w-full rounded-xl border border-border px-3 py-2.5 text-sm text-charcoal outline-none focus:ring-2 focus:ring-sage resize-none"
+            className={`w-full rounded-xl border px-3 py-2.5 text-sm text-charcoal outline-none focus:ring-2 focus:ring-sage resize-none transition-colors ${
+              isListening ? 'border-rose' : 'border-border'
+            }`}
           />
           {isSupported && (
             <button
@@ -131,7 +139,7 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
               onClick={isListening ? stopListening : startListening}
               className={`absolute bottom-2.5 right-2.5 w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${
                 isListening
-                  ? 'bg-rose text-white animate-pulse'
+                  ? 'bg-rose text-white'
                   : 'bg-cream hover:bg-cream-dark text-mid'
               }`}
               aria-label={isListening ? 'Stop recording' : 'Start voice input'}
@@ -141,6 +149,17 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
             </button>
           )}
         </div>
+        {/* Listening status banner */}
+        {isListening && (
+          <div className="flex items-center gap-2 px-3 py-2 bg-rose/10 border border-rose/20 rounded-lg">
+            <span className="flex gap-0.5 items-end h-4">
+              <span className="w-1 bg-rose rounded-full animate-bounce" style={{ height: '60%', animationDelay: '0ms' }} />
+              <span className="w-1 bg-rose rounded-full animate-bounce" style={{ height: '100%', animationDelay: '150ms' }} />
+              <span className="w-1 bg-rose rounded-full animate-bounce" style={{ height: '60%', animationDelay: '300ms' }} />
+            </span>
+            <span className="text-xs font-medium text-rose">Listening… speak now, tap mic to stop</span>
+          </div>
+        )}
       </div>
 
       {/* Severity */}
