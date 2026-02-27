@@ -349,7 +349,8 @@ export default function Onboarding() {
       </div>
 
       {/* Messages — natural height, page scrolls */}
-      <div className="px-4 py-4 space-y-3">
+      {/* pt-16 (64px) offsets the ~60px sticky header so the first message isn't hidden behind it */}
+      <div className="px-4 pt-16 pb-4 space-y-3">
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
