@@ -299,7 +299,7 @@ export default function Onboarding() {
   const showFinish = userHasSentMessage && !isStreaming
 
   return (
-    <div className="min-h-screen bg-cream flex flex-col">
+    <div className="min-h-screen bg-cream">
       {/* Header — sticky so it stays visible while scrolling */}
       <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-white border-b border-border">
         <div className="flex items-center gap-2.5">
@@ -314,8 +314,8 @@ export default function Onboarding() {
         </button>
       </div>
 
-      {/* Messages — natural flow, whole page scrolls */}
-      <div className="flex-1 px-4 py-4 space-y-3">
+      {/* Messages — natural height, page scrolls */}
+      <div className="px-4 py-4 space-y-3">
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
