@@ -299,9 +299,9 @@ export default function Onboarding() {
   const showFinish = userHasSentMessage && !isStreaming
 
   return (
-    <div className="flex flex-col h-screen bg-cream">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-border shrink-0">
+    <div className="min-h-screen bg-cream flex flex-col">
+      {/* Header — sticky so it stays visible while scrolling */}
+      <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-white border-b border-border">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 bg-sage rounded-full flex items-center justify-center text-white">🌿</div>
           <div>
@@ -314,8 +314,8 @@ export default function Onboarding() {
         </button>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+      {/* Messages — natural flow, whole page scrolls */}
+      <div className="flex-1 px-4 py-4 space-y-3">
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
@@ -347,7 +347,7 @@ export default function Onboarding() {
 
       {/* Finish Setup */}
       {showFinish && (
-        <div className="px-4 pb-2 shrink-0">
+        <div className="px-4 pb-2">
           <button
             onClick={handleFinish}
             className="w-full bg-sage text-white py-3 rounded-xl font-medium text-sm hover:bg-sage-light transition-colors"
@@ -357,8 +357,8 @@ export default function Onboarding() {
         </div>
       )}
 
-      {/* Input bar */}
-      <div className="bg-white border-t border-border px-3 py-3 shrink-0 safe-area-bottom">
+      {/* Input bar — inline below messages, not fixed */}
+      <div className="bg-white border-t border-border px-3 py-3">
         <div className="flex items-end gap-2">
           <textarea
             ref={inputRef}
