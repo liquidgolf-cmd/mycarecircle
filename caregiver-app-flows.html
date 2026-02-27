@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareCircle — User Flows & Screen Map</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --sage: #7a9e87;
+    --sage-light: #b5cfc0;
+    --sage-dark: #4a6e57;
+    --cream: #f7f4ef;
+    --warm-white: #fdfcfa;
+    --charcoal: #2c2c2c;
+    --mid: #6b6b6b;
+    --light: #a0a0a0;
+    --border: #e2ddd6;
+    --amber: #d4924a;
+    --amber-light: #f2dfc4;
+    --rose: #c47a7a;
+    --rose-light: #f2d8d8;
+    --blue: #6a8caf;
+    --blue-light: #d5e3f0;
+    --purple: #8a7aaf;
+    --purple-light: #dfd8f2;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--charcoal);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--charcoal);
+    padding: 2rem 3rem;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    color: var(--cream);
+    letter-spacing: -0.02em;
+  }
+
+  header span {
+    font-size: 0.85rem;
+    color: var(--sage-light);
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .nav {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 3rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+
+  .nav-btn {
+    padding: 1rem 1.5rem;
+    border: none;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--light);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .nav-btn:hover { color: var(--charcoal); }
+  .nav-btn.active {
+    color: var(--sage-dark);
+    border-bottom-color: var(--sage-dark);
+  }
+
+  .main {
+    padding: 2.5rem 3rem;
+    max-width: 1400px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── OVERVIEW FLOW ── */
+  .flow-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    color: var(--charcoal);
+    margin-bottom: 0.4rem;
+  }
+  .flow-desc {
+    color: var(--mid);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    font-weight: 300;
+  }
+
+  .flow-diagram {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    flex-wrap: nowrap;
+  }
+
+  .flow-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    flex-shrink: 0;
+  }
+
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    padding-top: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .flow-arrow svg {
+    color: var(--light);
+  }
+
+  .flow-box {
+    width: 130px;
+    background: var(--warm-white);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 0.8rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .flow-box:hover {
+    border-color: var(--sage);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  }
+
+  .flow-box.highlight {
+    background: var(--sage-dark);
+    border-color: var(--sage-dark);
+  }
+  .flow-box.highlight .flow-box-label { color: white; }
+  .flow-box.highlight .flow-box-sub { color: var(--sage-light); }
+
+  .flow-icon {
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .flow-box-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--charcoal);
+    line-height: 1.3;
+  }
+
+  .flow-box-sub {
+    font-size: 0.68rem;
+    color: var(--light);
+    margin-top: 0.3rem;
+    line-height: 1.3;
+  }
+
+  .flow-branch {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  /* ── SCREEN CARDS ── */
+  .screens-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .screen-card {
+    background: var(--warm-white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+
+  .screen-card:hover {
+    border-color: var(--sage);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+
+  .screen-header {
+    padding: 1.2rem 1.4rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .screen-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .icon-sage { background: #e8f0eb; }
+  .icon-amber { background: var(--amber-light); }
+  .icon-rose { background: var(--rose-light); }
+  .icon-blue { background: var(--blue-light); }
+  .icon-purple { background: var(--purple-light); }
+
+  .screen-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--charcoal);
+  }
+
+  .screen-route {
+    font-size: 0.72rem;
+    color: var(--light);
+    font-family: monospace;
+    margin-top: 0.15rem;
+  }
+
+  .screen-body {
+    padding: 1.2rem 1.4rem;
+  }
+
+  .screen-purpose {
+    font-size: 0.82rem;
+    color: var(--mid);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .elements-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--light);
+    margin-bottom: 0.5rem;
+  }
+
+  .element-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .element-list li {
+    font-size: 0.78rem;
+    color: var(--charcoal);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .element-list li::before {
+    content: '—';
+    color: var(--sage);
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: var(--purple-light);
+    color: var(--purple);
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    margin-top: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  .phase-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-left: 0.5rem;
+  }
+
+  .phase-1 { background: #e8f0eb; color: var(--sage-dark); }
+  .phase-2 { background: var(--amber-light); color: #8a5c1e; }
+  .phase-3 { background: var(--blue-light); color: #2d5a7a; }
+
+  /* ── USER PERSONAS ── */
+  .personas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .persona-card {
+    background: var(--warm-white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 1.8rem;
+  }
+
+  .persona-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .persona-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .persona-role {
+    font-size: 0.78rem;
+    color: var(--mid);
+    margin-bottom: 1rem;
+    font-weight: 300;
+  }
+
+  .persona-need {
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: var(--charcoal);
+    border-left: 3px solid var(--sage);
+    padding-left: 0.8rem;
+    margin-bottom: 1rem;
+    font-style: italic;
+  }
+
+  .persona-flows {
+    font-size: 0.78rem;
+    color: var(--mid);
+  }
+
+  .persona-flows strong {
+    color: var(--charcoal);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── AI FLOWS ── */
+  .ai-flow {
+    background: var(--warm-white);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .ai-flow-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .ai-flow-desc {
+    font-size: 0.82rem;
+    color: var(--mid);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .conversation {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    background: #f0ede8;
+    border-radius: 12px;
+    padding: 1.2rem;
+  }
+
+  .msg {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+
+  .msg.ai { flex-direction: row; }
+  .msg.user { flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .msg.ai .msg-avatar { background: var(--sage-dark); }
+  .msg.user .msg-avatar { background: var(--charcoal); }
+
+  .msg-bubble {
+    max-width: 75%;
+    padding: 0.7rem 1rem;
+    border-radius: 14px;
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+
+  .msg.ai .msg-bubble {
+    background: white;
+    color: var(--charcoal);
+    border-bottom-left-radius: 4px;
+  }
+
+  .msg.user .msg-bubble {
+    background: var(--charcoal);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+
+  .msg-system {
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--light);
+    font-style: italic;
+    padding: 0.2rem;
+  }
+
+  /* ── PHASE TIMELINE ── */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .phase-block {
+    display: flex;
+    gap: 2rem;
+    position: relative;
+  }
+
+  .phase-block::before {
+    content: '';
+    position: absolute;
+    left: 119px;
+    top: 2.5rem;
+    bottom: -1px;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .phase-block:last-child::before { display: none; }
+
+  .phase-left {
+    width: 120px;
+    flex-shrink: 0;
+    padding-top: 1.5rem;
+    text-align: right;
+  }
+
+  .phase-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.5rem;
+    color: var(--border);
+    line-height: 1;
+  }
+
+  .phase-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--light);
+  }
+
+  .phase-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--sage-dark);
+    flex-shrink: 0;
+    margin-top: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .phase-content {
+    flex: 1;
+    padding: 1.5rem 0 2.5rem;
+  }
+
+  .phase-content h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.3rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .phase-content p {
+    font-size: 0.82rem;
+    color: var(--mid);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+
+  .feature-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .chip {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    color: var(--charcoal);
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 2rem 0;
+  }
+
+  @media (max-width: 600px) {
+    header, .nav, .main { padding-left: 1.2rem; padding-right: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CareCircle</h1>
+  <span>User Flows &amp; Screen Architecture</span>
+</header>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="showSection('overview')">Overview Flow</button>
+  <button class="nav-btn" onclick="showSection('screens')">All Screens</button>
+  <button class="nav-btn" onclick="showSection('personas')">User Personas</button>
+  <button class="nav-btn" onclick="showSection('ai')">AI Flows</button>
+  <button class="nav-btn" onclick="showSection('phases')">Build Phases</button>
+</div>
+
+<div class="main">
+
+  <!-- OVERVIEW -->
+  <div id="overview" class="section active">
+    <h2 class="flow-title">App Flow Overview</h2>
+    <p class="flow-desc">The primary user journey from first launch through daily active use</p>
+
+    <div style="overflow-x:auto; padding-bottom:1rem;">
+      <div style="display:flex; align-items:center; gap:0; min-width:900px; padding:1rem 0;">
+
+        <!-- Launch -->
+        <div class="flow-node">
+          <div class="flow-box highlight">
+            <span class="flow-icon">📱</span>
+            <div class="flow-box-label">App Launch</div>
+            <div class="flow-box-sub">First open</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow"><svg width="32" height="16" viewBox="0 0 32 16"><path d="M0 8h28M22 2l8 6-8 6" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+
+        <!-- Auth branch -->
+        <div class="flow-node">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div class="flow-box">
+              <span class="flow-icon">✨</span>
+              <div class="flow-box-label">Sign Up</div>
+              <div class="flow-box-sub">New user</div>
+            </div>
+            <div class="flow-box">
+              <span class="flow-icon">🔑</span>
+              <div class="flow-box-label">Log In</div>
+              <div class="flow-box-sub">Returning</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flow-arrow"><svg width="32" height="16" viewBox="0 0 32 16"><path d="M0 8h28M22 2l8 6-8 6" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+
+        <!-- Onboarding -->
+        <div class="flow-node">
+          <div class="flow-box" style="border-color:#8a7aaf; background:#f9f7ff;">
+            <span class="flow-icon">🤖</span>
+            <div class="flow-box-label">AI Onboarding Chat</div>
+            <div class="flow-box-sub">Conversational setup</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow"><svg width="32" height="16" viewBox="0 0 32 16"><path d="M0 8h28M22 2l8 6-8 6" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+
+        <!-- Invite -->
+        <div class="flow-node">
+          <div class="flow-box">
+            <span class="flow-icon">👥</span>
+            <div class="flow-box-label">Invite Family</div>
+            <div class="flow-box-sub">Care circle setup</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow"><svg width="32" height="16" viewBox="0 0 32 16"><path d="M0 8h28M22 2l8 6-8 6" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>
+
+        <!-- Home -->
+        <div class="flow-node">
+          <div class="flow-box highlight">
+            <span class="flow-icon">🏠</span>
+            <div class="flow-box-label">Home Dashboard</div>
+            <div class="flow-box-sub">Daily hub</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h2 class="flow-title" style="font-size:1.2rem;">Daily Use Flows</h2>
+    <p class="flow-desc">What a family member does during a typical visit to the app</p>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px,1fr)); gap:1rem; margin-top:1rem;">
+
+      <div style="background:var(--warm-white); border:1.5px solid var(--border); border-radius:14px; padding:1.4rem;">
+        <div style="font-weight:600; font-size:0.9rem; margin-bottom:0.8rem; display:flex; align-items:center; gap:0.5rem;">
+          <span style="background:#e8f0eb; padding:0.3rem 0.5rem; border-radius:8px; font-size:1rem;">📝</span>
+          Log an Update
+        </div>
+        <div style="font-size:0.78rem; color:var(--mid); line-height:1.7;">
+          Home → Tap "Add Entry" → Choose category → Write note or dictate → Save → Notifies other members
+        </div>
+      </div>
+
+      <div style="background:var(--warm-white); border:1.5px solid var(--border); border-radius:14px; padding:1.4rem;">
+        <div style="font-weight:600; font-size:0.9rem; margin-bottom:0.8rem; display:flex; align-items:center; gap:0.5rem;">
+          <span style="background:var(--amber-light); padding:0.3rem 0.5rem; border-radius:8px; font-size:1rem;">💊</span>
+          Update Medications
+        </div>
+        <div style="font-size:0.78rem; color:var(--mid); line-height:1.7;">
+          Home → Medications tab → Add/Edit med → Confirm dosage → Auto-logged as a care entry
+        </div>
+      </div>
+
+      <div style="background:var(--warm-white); border:1.5px solid var(--border); border-radius:14px; padding:1.4rem;">
+        <div style="font-weight:600; font-size:0.9rem; margin-bottom:0.8rem; display:flex; align-items:center; gap:0.5rem;">
+          <span style="background:var(--blue-light); padding:0.3rem 0.5rem; border-radius:8px; font-size:1rem;">📅</span>
+          Schedule Appointment
+        </div>
+        <div style="font-size:0.78rem; color:var(--mid); line-height:1.7;">
+          Home → Appointments → Add → Set date, doctor, assign family member → Sends reminder to assignee
+        </div>
+      </div>
+
+      <div style="background:var(--warm-white); border:1.5px solid var(--border); border-radius:14px; padding:1.4rem;">
+        <div style="font-weight:600; font-size:0.9rem; margin-bottom:0.8rem; display:flex; align-items:center; gap:0.5rem;">
+          <span style="background:var(--purple-light); padding:0.3rem 0.5rem; border-radius:8px; font-size:1rem;">🤖</span>
+          Catch Me Up
+        </div>
+        <div style="font-size:0.78rem; color:var(--mid); line-height:1.7;">
+          Home → "Catch me up" button → AI reads last 14 days of entries → Returns plain-language summary in seconds
+        </div>
+      </div>
+
+      <div style="background:var(--warm-white); border:1.5px solid var(--border); border-radius:14px; padding:1.4rem;">
+        <div style="font-weight:600; font-size:0.9rem; margin-bottom:0.8rem; display:flex; align-items:center; gap:0.5rem;">
+          <span style="background:var(--rose-light); padding:0.3rem 0.5rem; border-radius:8px; font-size:1rem;">🚨</span>
+          Status Check-In
+        </div>
+        <div style="font-size:0.78rem; color:var(--mid); line-height:1.7;">
+          Home → Today's Status → Tap Green / Yellow / Red → Optional note → Visible to all circle members instantly
+        </div>
+      </div>
+
+      <div style="background:var(--warm-white); border:1.5px solid var(--border); border-radius:14px; padding:1.4rem;">
+        <div style="font-weight:600; font-size:0.9rem; margin-bottom:0.8rem; display:flex; align-items:center; gap:0.5rem;">
+          <span style="background:#e8f0eb; padding:0.3rem 0.5rem; border-radius:8px; font-size:1rem;">📁</span>
+          Add a Document
+        </div>
+        <div style="font-size:0.78rem; color:var(--mid); line-height:1.7;">
+          Profile → Documents → Upload photo or PDF → Label type → Stored securely, accessible by all members
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCREENS -->
+  <div id="screens" class="section">
+    <h2 class="flow-title">All Screens</h2>
+    <p class="flow-desc">Complete screen inventory with purpose, elements, and build phase</p>
+
+    <div class="screens-grid">
+
+      <div class="screen-card">
+        <div class="screen-header">
+          <div class="screen-icon icon-sage">✨</div>
+          <div>
+            <div class="screen-title">Welcome / Splash <span class="phase-badge phase-1">MVP</span></div>
+            <div class="screen-route">/welcome</div>
+          </div>
+        </div>
+        <div class="screen-body">
+          <p class="screen-purpose">First impression. Communicates the app's warmth and purpose. Converts visitors to sign-ups.</p>
+          <div class="elements-label">UI Elements</div>
+          <ul class="element-list">
+            <li>App name + brief value statement</li>
+            <li>Soft illustration or family imagery</li>
+            <li>Sign Up and Log In CTAs</li>
+            <li>Continue with Google/Apple</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-header">
+          <div class="screen-icon icon-purple">🤖</div>
+          <div>
+            <div class="screen-title">AI Onboarding Chat <span class="phase-badge phase-1">MVP</span></div>
+            <div class="screen-route">/onboarding</div>
+          </div>
+        </div>
+        <div class="screen-body">
+          <p class="screen-purpose">Replaces all setup forms. AI guide named "Willow" asks conversational questions to build the care profile in the background.</p>
+          <div class="elements-label">UI Elements</div>
+          <ul class="element-list">
+            <li>Chat interface with AI guide avatar</li>
+            <li>Typing indicator / animated response</li>
+            <li>Quick-reply suggestion chips</li>
+            <li>Progress bar (subtle)</li>
+            <li>Skip option for later completion</li>
+          </ul>
+          <div class="ai-badge">✦ AI-powered setup</div>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-header">
+          <div class="screen-icon icon-sage">🏠</div>
+          <div>
+            <div class="screen-title">Home Dashboard <span class="phase-badge phase-1">MVP</span></div>
+            <div class="screen-route">/home</div>
+          </div>
+        </div>
+        <div class="screen-body">
+          <p class="screen-purpose">The daily hub. At a glance: today's status, recent activity, upcoming appointments, and quick actions.</p>
+          <div class="elements-label">UI Elements</div>
+          <ul class="element-list">
+            <li>Care recipient name + today's status badge</li>
+            <li>"Catch me up" AI summary button</li>
+            <li>Recent log feed (last 3 entries)</li>
+            <li>Upcoming appointments strip</li>
+            <li>Quick log entry FAB button</li>
+            <li>Active tasks count</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-header">
+          <div class="screen-icon icon-sage">📋</div>
+          <div>
+            <div class="screen-title">Care Log <span class="phase-badge phase-1">MVP</span></div>
+            <div class="screen-route">/log</div>
+          </div>
+        </div>
+        <div class="screen-body">
+          <p class="screen-purpose">Chronological journal of all entries. Searchable and filterable. The single source of truth for the family.</p>
+          <div class="elements-label">UI Elements</div>
+          <ul class="element-list">
+            <li>Timeline feed with date grouping</li>
+            <li>Category filter chips (health, meds, mood, general)</li>
+            <li>Author attribution on each entry</li>
+            <li>Search bar</li>
+            <li>Expandable entry detail</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-header">
+          <div class="screen-icon icon-sage">➕</div>
+          <div>
+            <div class="screen-title">Add Log Entry <span class="phase-badge phase-1">MVP</span></div>
+            <div class="screen-route">/log/new</div>
+          </div>
+        </div>
+        <div class="screen-body">
+          <p class="screen-purpose">Fast entry creation. Must be completable in under 30 seconds. Voice input is primary.</p>
+          <div class="elements-label">UI Elements</div>
+          <ul class="element-list">
+            <li>Category selector (icons, not dropdowns)</li>
+            <li>Text area with voice dictation button</li>
+            <li>Mood/severity optional tags</li>
+            <li>Photo attachment option</li>
+            <li>Post + notify toggle</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-header">
+          <div class="screen-icon icon-amber">💊</div>
+          <div>
+            <div class="screen-title">Medications <span class="phase-badge phase-1">MVP</span></div>
+            <div class="screen-route">/medications</div>
+          </div>
+        </div>
+        <div class="screen-body">
+          <p class="screen-purpose">Active medication list. Shared source of truth so every family member and caregiver has current info.</p>
+          <div class="elements-label">UI Elements</div>
+          <ul class="element-list">
+            <li>Medication cards with name, dose, frequency</li>
+            <li>Prescribing doctor + pharmacy</li>
+            <li>Active / inactive toggle</li>
+            <li>Add via photo scan (OCR) or manual</li>
+            <li>Last updated timestamp + by whom</li>
+          </ul>
+          <div class="ai-badge">✦ AI-assisted entry via photo</div>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-header">
+          <div class="screen-icon icon-blue">📅</div>
+          <div>
+            <div class="screen-title">Appointments <span class="phase-badge phase-2">Phase 2</span></div>
+            <div class="screen-route">/appointments</div>
+          </div>
+        </div>
+        <div class="screen-body">
+          <p class="screen-purpose">Upcoming and past appointments. Assigned to a family member. Post-visit notes attached.</p>
+          <div class="elements-label">UI Elements</div>
+          <ul class="element-list">
+            <li>Calendar strip + list view toggle</li>
+            <li>Appointment cards with provider + purpose</li>
+            <li>Assigned family member tag</li>
+            <li>Add post-visit notes inline</li>
+            <li>Reminder settings per appointment</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-header">
+          <div class="screen-icon icon-rose">✅</div>
+          <div>
+            <div class="screen-title">Tasks <span class="phase-badge phase-2">Phase 2</span></div>
+            <div class="screen-route">/tasks</div>
+          </div>
+        </div>
+        <div class="screen-body">
+          <p class="screen-purpose">Shared to-do list for care-related responsibilities. Assigned to specific family members with due dates.</p>
+          <div class="elements-label">UI Elements</div>
+          <ul class="element-list">
+            <li>Task list grouped by assignee</li>
+            <li>Due date + priority indicator</li>
+            <li>Complete/uncomplete toggle</li>
+            <li>Quick assign to circle member</li>
+            <li>Overdue highlighting</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-header">
+          <div class="screen-icon icon-blue">📁</div>
+          <div>
+            <div class="screen-title">Documents <span class="phase-badge phase-2">Phase 2</span></div>
+            <div class="screen-route">/documents</div>
+          </div>
+        </div>
+        <div class="screen-body">
+          <p class="screen-purpose">Secure vault for important documents. No more scrambling for the insurance card at the ER.</p>
+          <div class="elements-label">UI Elements</div>
+          <ul class="element-list">
+            <li>Document type categories (insurance, legal, medical, ID)</li>
+            <li>Upload via camera or file picker</li>
+            <li>Preview + full-screen view</li>
+            <li>Last updated + uploaded by</li>
+            <li>Expiration date flag for insurance cards</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-header">
+          <div class="screen-icon icon-purple">✦</div>
+          <div>
+            <div class="screen-title">AI Weekly Digest <span class="phase-badge phase-1">MVP</span></div>
+            <div class="screen-route">/digest</div>
+          </div>
+        </div>
+        <div class="screen-body">
+          <p class="screen-purpose">Auto-generated plain-language summary of the past week. Delivered via push and viewable in-app.</p>
+          <div class="elements-label">UI Elements</div>
+          <ul class="element-list">
+            <li>Week date range header</li>
+            <li>AI-written narrative summary</li>
+            <li>Highlighted observations (patterns, changes)</li>
+            <li>Upcoming week preview</li>
+            <li>Share digest option (email to doctor)</li>
+          </ul>
+          <div class="ai-badge">✦ AI-generated weekly</div>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-header">
+          <div class="screen-icon icon-sage">👤</div>
+          <div>
+            <div class="screen-title">Care Recipient Profile <span class="phase-badge phase-1">MVP</span></div>
+            <div class="screen-route">/profile</div>
+          </div>
+        </div>
+        <div class="screen-body">
+          <p class="screen-purpose">Central profile for the person being cared for. The foundation everything else is built on.</p>
+          <div class="elements-label">UI Elements</div>
+          <ul class="element-list">
+            <li>Name, photo, DOB, address</li>
+            <li>Primary physician + emergency contacts</li>
+            <li>Allergies + conditions list</li>
+            <li>Insurance info summary</li>
+            <li>Care circle members list</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-header">
+          <div class="screen-icon icon-amber">👥</div>
+          <div>
+            <div class="screen-title">Care Circle <span class="phase-badge phase-1">MVP</span></div>
+            <div class="screen-route">/circle</div>
+          </div>
+        </div>
+        <div class="screen-body">
+          <p class="screen-purpose">Manage who has access. Invite new members. Set roles and notification preferences per member.</p>
+          <div class="elements-label">UI Elements</div>
+          <ul class="element-list">
+            <li>Member list with role badges (admin, contributor, viewer)</li>
+            <li>Invite via email or shareable link</li>
+            <li>Remove member option (admin only)</li>
+            <li>Last active timestamp per member</li>
+            <li>Notification settings per member</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-header">
+          <div class="screen-icon icon-purple">🔔</div>
+          <div>
+            <div class="screen-title">Notifications <span class="phase-badge phase-1">MVP</span></div>
+            <div class="screen-route">/notifications</div>
+          </div>
+        </div>
+        <div class="screen-body">
+          <p class="screen-purpose">Activity feed for circle events. Replaces the group text thread completely.</p>
+          <div class="elements-label">UI Elements</div>
+          <ul class="element-list">
+            <li>Chronological activity feed</li>
+            <li>Grouped by day</li>
+            <li>Deep link to relevant screen on tap</li>
+            <li>Mark all read</li>
+            <li>Notification preference settings</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="screen-card">
+        <div class="screen-header">
+          <div class="screen-icon icon-rose">⚙️</div>
+          <div>
+            <div class="screen-title">Settings <span class="phase-badge phase-1">MVP</span></div>
+            <div class="screen-route">/settings</div>
+          </div>
+        </div>
+        <div class="screen-body">
+          <p class="screen-purpose">Account management, notification preferences, subscription, and privacy controls.</p>
+          <div class="elements-label">UI Elements</div>
+          <ul class="element-list">
+            <li>Account info + profile photo</li>
+            <li>Notification frequency controls</li>
+            <li>Digest delivery day/time setting</li>
+            <li>Subscription management</li>
+            <li>Data export option</li>
+            <li>Privacy + security settings</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PERSONAS -->
+  <div id="personas" class="section">
+    <h2 class="flow-title">User Personas</h2>
+    <p class="flow-desc">The three people who will use this app — design every screen for all three simultaneously</p>
+
+    <div class="personas-grid">
+
+      <div class="persona-card">
+        <div class="persona-avatar" style="background:#e8f0eb; font-size:1.6rem;">👩</div>
+        <div class="persona-name">Sarah, 47</div>
+        <div class="persona-role">Primary Caregiver — Lives nearby, most involved</div>
+        <div class="persona-need">"I'm doing most of the work and my siblings don't know what's going on. I need a way to keep everyone in the loop without writing a weekly email."</div>
+        <div class="persona-flows">
+          <strong>Primary Flows</strong>
+          Daily log entries, medication management, appointment scheduling, task delegation, weekly digest review
+        </div>
+      </div>
+
+      <div class="persona-card">
+        <div class="persona-avatar" style="background:var(--blue-light); font-size:1.6rem;">👨</div>
+        <div class="persona-name">Mark, 52</div>
+        <div class="persona-role">Out-of-town sibling — Wants to help but lives far away</div>
+        <div class="persona-need">"I feel guilty that I can't be there. I want to know what's actually happening without having to call and ask — I feel like I'm bothering everyone when I do."</div>
+        <div class="persona-flows">
+          <strong>Primary Flows</strong>
+          "Catch me up" AI summary, log browsing, task completion (calls, insurance research), weekly digest reading
+        </div>
+      </div>
+
+      <div class="persona-card">
+        <div class="persona-avatar" style="background:var(--amber-light); font-size:1.6rem;">👴</div>
+        <div class="persona-name">Bob, 74</div>
+        <div class="persona-role">Care recipient's spouse — Involved but not tech-savvy</div>
+        <div class="persona-need">"My kids set something up on my phone. I just want to see what appointments are coming up and maybe add a note when something happens. Keep it simple."</div>
+        <div class="persona-flows">
+          <strong>Primary Flows</strong>
+          Status check-in, appointment viewing, simple log entry (large text, voice input), reading recent entries
+        </div>
+      </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <div style="background:var(--warm-white); border:1.5px solid var(--border); border-radius:16px; padding:1.8rem;">
+      <h3 style="font-family:'DM Serif Display',serif; font-size:1.2rem; margin-bottom:0.8rem;">The Design Tension to Solve</h3>
+      <p style="font-size:0.85rem; color:var(--mid); line-height:1.8;">
+        Sarah needs power and depth. Mark needs fast information at a glance. Bob needs simplicity and large text. 
+        The solution is a <strong style="color:var(--charcoal)">role-aware interface</strong> — the app presents the same data but in different default views based on the user's role in the care circle. 
+        An admin sees the full dashboard. A viewer sees a simplified read-only digest view. Accessibility settings (text size, contrast) are surfaced prominently, not buried in settings.
+      </p>
+    </div>
+  </div>
+
+  <!-- AI FLOWS -->
+  <div id="ai" class="section">
+    <h2 class="flow-title">AI Interaction Flows</h2>
+    <p class="flow-desc">How the AI guide integrates into key moments — not as a feature, but as a thread through the experience</p>
+
+    <div class="ai-flow">
+      <div class="ai-flow-title">
+        <span style="background:var(--purple-light); padding:0.3rem 0.5rem; border-radius:8px;">✨</span>
+        Conversational Onboarding
+      </div>
+      <div class="ai-flow-desc">New user signs up and is greeted by Willow, the AI care guide. No forms. The profile is built through natural conversation. Each response is parsed and structured in the background.</div>
+      <div class="conversation">
+        <div class="msg ai">
+          <div class="msg-avatar">🌿</div>
+          <div class="msg-bubble">Hi, I'm Willow. I'm here to help your family stay connected around your loved one's care. To get started — who are you setting this up for?</div>
+        </div>
+        <div class="msg user">
+          <div class="msg-avatar">👤</div>
+          <div class="msg-bubble">My mom, Dorothy. She's 78 and lives in Phoenix.</div>
+        </div>
+        <div class="msg-system">✦ Care recipient profile created: Dorothy, 78, Phoenix, AZ</div>
+        <div class="msg ai">
+          <div class="msg-avatar">🌿</div>
+          <div class="msg-bubble">Thanks. Is Dorothy managing any health conditions or taking medications regularly? No need to be exact — we can update this anytime.</div>
+        </div>
+        <div class="msg user">
+          <div class="msg-avatar">👤</div>
+          <div class="msg-bubble">She has Type 2 diabetes and takes Metformin twice a day. Also a blood pressure medication, Lisinopril, in the morning.</div>
+        </div>
+        <div class="msg-system">✦ Medications added: Metformin 2x daily, Lisinopril 1x morning</div>
+        <div class="msg ai">
+          <div class="msg-avatar">🌿</div>
+          <div class="msg-bubble">Got it. Are there other family members or caregivers who should have access to Dorothy's care updates?</div>
+        </div>
+        <div class="msg user">
+          <div class="msg-avatar">👤</div>
+          <div class="msg-bubble">Yes — my brother Mark in Seattle and her husband Bob who lives with her.</div>
+        </div>
+        <div class="msg-system">✦ Invite prompts queued for Mark and Bob</div>
+      </div>
+    </div>
+
+    <div class="ai-flow">
+      <div class="ai-flow-title">
+        <span style="background:var(--purple-light); padding:0.3rem 0.5rem; border-radius:8px;">⚡</span>
+        "Catch Me Up" On-Demand Summary
+      </div>
+      <div class="ai-flow-desc">A family member who's been away taps the "Catch me up" button. The AI reads recent log entries and returns a plain-language briefing in under 10 seconds.</div>
+      <div class="conversation">
+        <div class="msg user">
+          <div class="msg-avatar">👤</div>
+          <div class="msg-bubble">Catch me up — I've been traveling for two weeks.</div>
+        </div>
+        <div class="msg-system">✦ Retrieving 14 days of log entries for Dorothy's care circle...</div>
+        <div class="msg ai">
+          <div class="msg-avatar">🌿</div>
+          <div class="msg-bubble">Here's what happened while you were away: Dorothy had her endocrinology follow-up on the 14th — her A1C improved slightly and her Metformin dose was unchanged. On the 18th, Sarah noted she seemed more tired than usual and had some mild dizziness in the morning. Bob checked in green every day except the 19th, when he noted she had a poor appetite. Her Lisinopril was refilled on the 21st. Overall a fairly stable two weeks with the fatigue and dizziness worth keeping an eye on.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-flow">
+      <div class="ai-flow-title">
+        <span style="background:var(--purple-light); padding:0.3rem 0.5rem; border-radius:8px;">📊</span>
+        Pattern Recognition Alert
+      </div>
+      <div class="ai-flow-desc">The AI passively monitors log entries and surfaces patterns that busy family members might miss. Not a diagnosis — just a helpful observation delivered as a gentle nudge.</div>
+      <div class="conversation">
+        <div class="msg-system">✦ Pattern detected across 5 entries over 12 days</div>
+        <div class="msg ai">
+          <div class="msg-avatar">🌿</div>
+          <div class="msg-bubble">I noticed something you might want to mention to Dorothy's doctor: over the past two weeks, you and Bob have both noted morning dizziness or lightheadedness five separate times. This could be worth bringing up at her next visit — possibly related to her Lisinopril timing. Want me to draft a note you could share with her physician?</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PHASES -->
+  <div id="phases" class="section">
+    <h2 class="flow-title">Build Phases</h2>
+    <p class="flow-desc">What to build when — prioritized for fastest validation with real caregivers</p>
+
+    <div class="timeline">
+
+      <div class="phase-block">
+        <div class="phase-left">
+          <div class="phase-num">01</div>
+          <div class="phase-label">MVP</div>
+        </div>
+        <div class="phase-dot"></div>
+        <div class="phase-content">
+          <h3>Core Validation Build</h3>
+          <p>Build only what's needed to prove the core value proposition: shared care log + AI onboarding + weekly digest. Get this in front of 10 real caregiver families within 8–10 weeks.</p>
+          <div class="feature-chips">
+            <span class="chip">AI onboarding chat</span>
+            <span class="chip">Shared care log</span>
+            <span class="chip">Medication list</span>
+            <span class="chip">Daily status (green/yellow/red)</span>
+            <span class="chip">Family circle invites</span>
+            <span class="chip">Weekly AI digest</span>
+            <span class="chip">"Catch me up" button</span>
+            <span class="chip">Push notifications</span>
+            <span class="chip">Care recipient profile</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-block">
+        <div class="phase-left">
+          <div class="phase-num">02</div>
+          <div class="phase-label">Growth</div>
+        </div>
+        <div class="phase-dot" style="background:var(--amber);"></div>
+        <div class="phase-content">
+          <h3>Full Feature Completion</h3>
+          <p>Add the features that increase daily engagement and reduce churn. Build after MVP feedback confirms the core is working.</p>
+          <div class="feature-chips">
+            <span class="chip">Appointments with assignment</span>
+            <span class="chip">Task management</span>
+            <span class="chip">Document vault</span>
+            <span class="chip">Medication photo scan (OCR)</span>
+            <span class="chip">Pattern recognition alerts</span>
+            <span class="chip">Voice log entry</span>
+            <span class="chip">Doctor visit note drafting</span>
+            <span class="chip">Calendar integrations</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-block">
+        <div class="phase-left">
+          <div class="phase-num">03</div>
+          <div class="phase-label">Scale</div>
+        </div>
+        <div class="phase-dot" style="background:var(--blue);"></div>
+        <div class="phase-content">
+          <h3>B2B + Platform Expansion</h3>
+          <p>Open the platform to professional caregivers and home health agencies who want to communicate with families through the app. Unlocks a significantly higher revenue tier.</p>
+          <div class="feature-chips">
+            <span class="chip">Professional caregiver accounts</span>
+            <span class="chip">Agency dashboard</span>
+            <span class="chip">Shift log integration</span>
+            <span class="chip">Family-to-agency messaging</span>
+            <span class="chip">Care plan templates</span>
+            <span class="chip">API for home health systems</span>
+            <span class="chip">Multi-recipient support</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
