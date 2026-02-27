@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { UserPlus, Trash2, Mail, Crown, Eye, Pencil } from 'lucide-react'
+import { UserPlus, Trash2, Mail, Crown, Eye, Pencil, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
 import { useCircle } from '../context/CircleContext'
@@ -51,6 +51,12 @@ export default function Circle() {
   const [inviteRole, setInviteRole] = useState('contributor')
   const [sending, setSending] = useState(false)
 
+  // Suggested helpers from onboarding — local copy so dismissals are instant
+  const [localSuggestions, setLocalSuggestions] = useState([])
+  useEffect(() => {
+    setLocalSuggestions(recipient?.suggested_helpers || [])
+  }, [recipient?.suggested_helpers])
+
   const fetchInvites = useCallback(async () => {
     if (!isAdmin) return
     setInvitesLoading(true)
@@ -73,8 +79,20 @@ export default function Circle() {
     if (!inviteEmail.trim()) return
     setSending(true)
     try {
-      await api.post('/circle/invites', { name: inviteName.trim(), email: inviteEmail.trim(), role: inviteRole })
-      toast.success(`Invite sent to ${inviteName.trim() || inviteEmail.trim()}`)
+      const sentName = inviteName.trim()
+      await api.post('/circle/invites', { name: sentName, email: inviteEmail.trim(), role: inviteRole })
+      toast.success(`Invite sent to ${sentName || inviteEmail.trim()}`)
+
+      // If this invite was for a suggested helper, remove them from suggestions
+      if (sentName && localSuggestions.includes(sentName)) {
+        const updated = localSuggestions.filter((n) => n !== sentName)
+        setLocalSuggestions(updated)
+        api.patch('/circle/recipient', {
+          recipient_id: recipient.id,
+          suggested_helpers: updated,
+        }).catch(() => {})
+      }
+
       setInviteName('')
       setInviteEmail('')
       setInviteRole('contributor')
@@ -94,6 +112,30 @@ export default function Circle() {
       toast.success('Invite revoked')
     } catch {
       toast.error('Failed to revoke invite')
+    }
+  }
+
+  // Pre-fill the invite form with a suggested helper's name and open it
+  function handleInviteSuggestion(name) {
+    setInviteName(name)
+    setInviteEmail('')
+    setInviteRole('contributor')
+    setShowInviteForm(true)
+    // Scroll to top so the form is visible
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // Remove a suggestion from the DB and local list (no invite sent)
+  async function handleRemoveSuggestion(name) {
+    const updated = localSuggestions.filter((n) => n !== name)
+    setLocalSuggestions(updated)
+    try {
+      await api.patch('/circle/recipient', {
+        recipient_id: recipient.id,
+        suggested_helpers: updated,
+      })
+    } catch {
+      // Non-fatal — the UI already updated; silently ignore
     }
   }
 
@@ -196,6 +238,46 @@ export default function Circle() {
             </div>
           </form>
         </div>
+      )}
+
+      {/* Suggested helpers from onboarding — admin only */}
+      {isAdmin && localSuggestions.length > 0 && (
+        <section>
+          <h2 className="text-xs font-semibold text-mid uppercase tracking-wide mb-1">
+            Suggested Helpers
+          </h2>
+          <p className="text-xs text-mid mb-3">
+            Mentioned during your setup — invite them to join {recipient.full_name}'s circle.
+          </p>
+          <div className="space-y-2">
+            {localSuggestions.map((name) => (
+              <div
+                key={name}
+                className="bg-white rounded-xl border border-sage/30 px-4 py-3 flex items-center gap-3"
+              >
+                <MemberAvatar name={name} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-charcoal truncate">{name}</p>
+                  <p className="text-xs text-mid">From your setup conversation</p>
+                </div>
+                <button
+                  onClick={() => handleInviteSuggestion(name)}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sage text-white text-xs font-medium hover:bg-sage-light transition-colors shrink-0"
+                >
+                  <UserPlus size={12} />
+                  Invite
+                </button>
+                <button
+                  onClick={() => handleRemoveSuggestion(name)}
+                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-cream text-mid hover:text-charcoal transition-colors shrink-0"
+                  aria-label={`Remove ${name} from suggestions`}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
       )}
 
       {/* Members list */}

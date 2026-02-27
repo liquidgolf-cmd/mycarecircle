@@ -229,6 +229,14 @@ export default function Onboarding() {
           for (const med of data.medications) {
             await api.post('/medications', { recipient_id: newId, name: med }).catch(() => {})
           }
+          // Save suggested helpers separately — fire-and-forget so a missing
+          // DB column (pre-migration) never breaks the core circle creation.
+          if (data.family_members?.length) {
+            api.patch('/circle/recipient', {
+              recipient_id: newId,
+              suggested_helpers: data.family_members,
+            }).catch(() => {})
+          }
         } finally {
           syncInProgressRef.current = false
         }
@@ -241,6 +249,14 @@ export default function Onboarding() {
           conditions: data.conditions,
           allergies: data.allergies,
         }).catch(() => {})
+        // Save suggested helpers separately — fire-and-forget so a missing
+        // DB column (pre-migration) never affects the core profile update.
+        if (data.family_members?.length) {
+          api.patch('/circle/recipient', {
+            recipient_id: currentRecipientId,
+            suggested_helpers: data.family_members,
+          }).catch(() => {})
+        }
       }
     } catch { /* silent */ }
   }

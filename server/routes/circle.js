@@ -133,7 +133,7 @@ router.patch('/recipient', async (req, res) => {
   if (!circle) return res.status(403).json({ error: 'Not a member of this circle' })
   if (circle.role !== 'admin') return res.status(403).json({ error: 'Admin role required' })
 
-  const allowed = ['full_name', 'date_of_birth', 'city', 'state', 'primary_physician', 'allergies', 'conditions', 'emergency_contact']
+  const allowed = ['full_name', 'date_of_birth', 'city', 'state', 'primary_physician', 'allergies', 'conditions', 'emergency_contact', 'suggested_helpers']
   const filtered = Object.fromEntries(Object.entries(updates).filter(([k]) => allowed.includes(k)))
 
   if (Object.keys(filtered).length === 0) {
