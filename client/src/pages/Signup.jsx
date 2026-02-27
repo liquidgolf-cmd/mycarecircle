@@ -8,12 +8,13 @@ export default function Signup() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const inviteToken = searchParams.get('invite')
+  const inviteName = searchParams.get('name') || ''
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm()
+  } = useForm({ defaultValues: { full_name: inviteName } })
 
   async function onSubmit(values) {
     try {

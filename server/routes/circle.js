@@ -156,7 +156,7 @@ router.patch('/recipient', async (req, res) => {
 // POST /api/v1/circle/invites
 // Create and email an invite to join the circle
 router.post('/invites', async (req, res) => {
-  const { email, role = 'contributor' } = req.body
+  const { email, role = 'contributor', name = '' } = req.body
 
   if (!email || !email.trim()) return res.status(400).json({ error: 'email is required' })
   if (!['admin', 'contributor', 'viewer'].includes(role)) {
@@ -185,6 +185,7 @@ router.post('/invites', async (req, res) => {
       invited_by: req.user.id,
       email: email.toLowerCase().trim(),
       role,
+      name: name.trim() || null,
     })
     .select()
     .single()
@@ -203,9 +204,10 @@ router.post('/invites', async (req, res) => {
     .eq('id', req.user.id)
     .single()
   const inviterName = inviterProfile?.full_name || req.user.email || 'Someone'
+  const inviteeName = invite.name || null
 
   // Fire-and-forget: send email (don't fail the request if email fails)
-  sendInviteEmail({ to: invite.email, inviterName, recipientName, role, token: invite.token })
+  sendInviteEmail({ to: invite.email, inviterName, inviteeName, recipientName, role, token: invite.token })
     .catch((err) => console.error('[invite email error]', err.message))
 
   return res.status(201).json({ invite })
@@ -226,7 +228,7 @@ router.get('/invites', async (req, res) => {
 
   const { data: invites, error } = await supabase
     .from('circle_invites')
-    .select('id, email, role, status, expires_at, created_at')
+    .select('id, email, name, role, status, expires_at, created_at')
     .eq('recipient_id', membership.recipient_id)
     .eq('status', 'pending')
     .order('created_at', { ascending: false })

@@ -127,7 +127,7 @@ export default function InviteAccept() {
               </p>
               <div className="space-y-2">
                 <Link
-                  to={`/signup?invite=${token}`}
+                  to={`/signup?invite=${token}${invite?.name ? `&name=${encodeURIComponent(invite.name)}` : ''}`}
                   className="block w-full bg-sage text-white py-3 rounded-xl text-sm font-medium hover:bg-sage-light transition-colors"
                 >
                   Create an account

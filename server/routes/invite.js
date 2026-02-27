@@ -18,7 +18,7 @@ const router = express.Router()
 router.get('/:token', async (req, res) => {
   const { data: invite, error } = await supabase
     .from('circle_invites')
-    .select('id, email, role, status, expires_at, recipient_id, care_recipients(full_name)')
+    .select('id, email, name, role, status, expires_at, recipient_id, care_recipients(full_name)')
     .eq('token', req.params.token)
     .maybeSingle()
 
@@ -40,6 +40,7 @@ router.get('/:token', async (req, res) => {
 
   return res.json({
     email: invite.email,
+    name: invite.name || null,
     role: invite.role,
     recipient_name: invite.care_recipients?.full_name ?? 'Unknown',
   })

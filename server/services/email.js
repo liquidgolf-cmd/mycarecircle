@@ -24,10 +24,11 @@ async function sendEmail({ to, subject, html }) {
 
 // ── Invite email ────────────────────────────────────────────────────────────
 
-async function sendInviteEmail({ to, inviterName, recipientName, role, token }) {
+async function sendInviteEmail({ to, inviterName, inviteeName, recipientName, role, token }) {
   const inviteUrl = `${APP_URL}/invite/${token}`
   const roleLabel =
     role === 'admin' ? 'Admin' : role === 'contributor' ? 'Contributor' : 'Viewer'
+  const greeting = inviteeName ? `Hi ${inviteeName},` : 'Hi,'
 
   return sendEmail({
     to,
@@ -35,6 +36,7 @@ async function sendInviteEmail({ to, inviterName, recipientName, role, token }) 
     html: `
       <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#f7f4ef;border-radius:16px">
         <h2 style="color:#2c2c2c;margin:0 0 12px">You're invited to join a care circle 💙</h2>
+        <p style="color:#666;line-height:1.6;margin:0 0 8px">${greeting}</p>
         <p style="color:#666;line-height:1.6;margin:0 0 20px">
           <strong>${inviterName}</strong> has invited you to help care for
           <strong>${recipientName}</strong> on My Care Circle as a

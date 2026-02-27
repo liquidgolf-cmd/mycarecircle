@@ -46,6 +46,7 @@ export default function Circle() {
   const [invites, setInvites] = useState([])
   const [invitesLoading, setInvitesLoading] = useState(false)
   const [showInviteForm, setShowInviteForm] = useState(false)
+  const [inviteName, setInviteName] = useState('')
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState('contributor')
   const [sending, setSending] = useState(false)
@@ -72,8 +73,9 @@ export default function Circle() {
     if (!inviteEmail.trim()) return
     setSending(true)
     try {
-      await api.post('/circle/invites', { email: inviteEmail.trim(), role: inviteRole })
-      toast.success(`Invite sent to ${inviteEmail.trim()}`)
+      await api.post('/circle/invites', { name: inviteName.trim(), email: inviteEmail.trim(), role: inviteRole })
+      toast.success(`Invite sent to ${inviteName.trim() || inviteEmail.trim()}`)
+      setInviteName('')
       setInviteEmail('')
       setInviteRole('contributor')
       setShowInviteForm(false)
@@ -139,6 +141,18 @@ export default function Circle() {
           <form onSubmit={handleInvite} className="space-y-3">
             <div>
               <label className="block text-xs font-medium text-mid mb-1 uppercase tracking-wide">
+                Name
+              </label>
+              <input
+                type="text"
+                value={inviteName}
+                onChange={(e) => setInviteName(e.target.value)}
+                placeholder="Jane Smith"
+                className="w-full rounded-lg border border-border px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sage"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-mid mb-1 uppercase tracking-wide">
                 Email address
               </label>
               <input
@@ -146,7 +160,7 @@ export default function Circle() {
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
                 required
-                placeholder="family@example.com"
+                placeholder="jane@example.com"
                 className="w-full rounded-lg border border-border px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sage"
               />
             </div>
@@ -244,10 +258,21 @@ export default function Circle() {
                   className="bg-white rounded-xl border border-border px-4 py-3 flex items-center gap-3"
                 >
                   <div className="w-9 h-9 rounded-full bg-cream border border-border flex items-center justify-center shrink-0">
-                    <Mail size={15} className="text-mid" />
+                    {inv.name ? (
+                      <span className="text-sm font-semibold text-sage">
+                        {inv.name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()}
+                      </span>
+                    ) : (
+                      <Mail size={15} className="text-mid" />
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-charcoal truncate">{inv.email}</p>
+                    {inv.name && (
+                      <p className="text-sm font-medium text-charcoal truncate">{inv.name}</p>
+                    )}
+                    <p className={`truncate ${inv.name ? 'text-xs text-mid' : 'text-sm font-medium text-charcoal'}`}>
+                      {inv.email}
+                    </p>
                     <p className="text-xs text-mid mt-0.5">
                       Expires {new Date(inv.expires_at).toLocaleDateString()}
                     </p>
