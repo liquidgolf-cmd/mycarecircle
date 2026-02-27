@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Mic, MicOff } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -34,9 +34,15 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
   const [severity, setSeverity] = useState(existingEntry?.severity || 'normal')
   const [saving, setSaving] = useState(false)
 
-  const { isListening, isSupported, startListening } = useVoiceInput((transcript) => {
+  const { isListening, isSupported, startListening, stopListening, permissionDenied } = useVoiceInput((transcript) => {
     setBody((prev) => prev + (prev ? ' ' : '') + transcript)
   })
+
+  useEffect(() => {
+    if (permissionDenied) {
+      toast.error('Microphone access denied. Please allow microphone access in your browser settings.')
+    }
+  }, [permissionDenied])
 
   function handleDocumentScanned(extracted) {
     if (extracted.body)     setBody(extracted.body)
@@ -122,11 +128,14 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
           {isSupported && (
             <button
               type="button"
-              onClick={startListening}
+              onClick={isListening ? stopListening : startListening}
               className={`absolute bottom-2.5 right-2.5 w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${
-                isListening ? 'bg-rose text-white' : 'bg-cream hover:bg-cream-dark text-mid'
+                isListening
+                  ? 'bg-rose text-white animate-pulse'
+                  : 'bg-cream hover:bg-cream-dark text-mid'
               }`}
-              aria-label="Voice input"
+              aria-label={isListening ? 'Stop recording' : 'Start voice input'}
+              title={isListening ? 'Tap to stop' : 'Tap to speak'}
             >
               {isListening ? <MicOff size={15} /> : <Mic size={15} />}
             </button>
