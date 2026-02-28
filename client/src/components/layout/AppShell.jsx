@@ -49,7 +49,7 @@ export default function AppShell() {
     return (
       <div className="min-h-screen bg-gradient-night flex items-center justify-center">
         <div className="text-center">
-          <p className="font-display text-2xl text-cloud mb-6 tracking-wide">The CareCircle</p>
+          <p className="font-display text-2xl text-cloud mb-6 tracking-wide">My CareCircle</p>
           <div className="w-8 h-8 border-2 border-mist border-t-transparent rounded-full animate-spin mx-auto" />
         </div>
       </div>

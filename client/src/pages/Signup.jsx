@@ -36,7 +36,7 @@ export default function Signup() {
             onClick={() => navigate('/')}
             className="font-display text-3xl text-cloud font-medium tracking-wide"
           >
-            The CareCircle
+            My CareCircle
           </button>
           <p className="mt-2 text-mist text-sm">
             {inviteToken ? 'Create a free account to accept your invitation.' : 'Free to start, no credit card needed.'}

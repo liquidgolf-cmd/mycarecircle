@@ -50,7 +50,7 @@ export default function Login() {
             onClick={() => navigate('/')}
             className="font-display text-3xl text-cloud font-medium tracking-wide"
           >
-            The CareCircle
+            My CareCircle
           </button>
           <p className="mt-2 text-mist text-sm">
             {inviteToken ? 'Sign in to accept your invitation.' : 'Welcome back.'}
@@ -123,7 +123,7 @@ export default function Login() {
         </div>
 
         <p className="text-center text-sm text-mist mt-5">
-          New to The CareCircle?{' '}
+          New to My CareCircle?{' '}
           <Link
             to={inviteToken ? `/signup?invite=${inviteToken}` : '/signup'}
             className="text-cloud font-medium hover:underline"

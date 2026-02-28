@@ -112,7 +112,7 @@ export default function Home() {
   if (!circleLoading && !recipient) {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <p className="font-display text-2xl text-night mb-2">The CareCircle</p>
+        <p className="font-display text-2xl text-night mb-2">My CareCircle</p>
         <p className="text-mist text-sm mb-6 max-w-xs">
           Set up your care circle so the whole team can stay in sync.
         </p>

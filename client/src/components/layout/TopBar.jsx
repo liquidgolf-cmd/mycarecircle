@@ -19,10 +19,10 @@ export default function TopBar() {
         className="shrink-0 leading-none"
       >
         <span className="font-display text-lg text-cloud font-medium tracking-wide hidden sm:inline">
-          The CareCircle
+          My CareCircle
         </span>
         <span className="font-display text-lg text-cloud font-medium tracking-wide sm:hidden">
-          TC
+          MC
         </span>
       </button>
 

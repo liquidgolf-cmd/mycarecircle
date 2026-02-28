@@ -225,7 +225,7 @@ export default function Welcome() {
               className="text-xl font-medium tracking-tight"
               style={{ fontFamily: "'Lora', Georgia, serif", color: '#fafcfe' }}
             >
-              The CareCircle
+              My CareCircle
             </span>
           </div>
         </div>

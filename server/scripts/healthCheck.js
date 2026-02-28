@@ -1,7 +1,7 @@
 /**
  * Health Check Script
  * Verifies that all required environment variables and external services
- * are correctly configured for The CareCircle backend.
+ * are correctly configured for My CareCircle backend.
  *
  * Usage: node server/scripts/healthCheck.js
  */
@@ -23,7 +23,7 @@ function result(label, passed, detail = '') {
 
 async function main() {
   console.log('\n═══════════════════════════════════════')
-  console.log('  The CareCircle — Environment Health Check')
+  console.log('  My CareCircle — Environment Health Check')
   console.log('═══════════════════════════════════════\n')
 
   let allPassed = true

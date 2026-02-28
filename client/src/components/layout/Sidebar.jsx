@@ -21,7 +21,7 @@ export default function Sidebar() {
     <aside className="hidden lg:flex flex-col w-60 bg-gradient-ocean shrink-0">
       {/* Wordmark */}
       <div className="h-14 flex items-center px-5">
-        <span className="font-display text-xl text-cloud font-medium tracking-wide">The CareCircle</span>
+        <span className="font-display text-xl text-cloud font-medium tracking-wide">My CareCircle</span>
       </div>
 
       {/* Nav */}

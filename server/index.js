@@ -87,7 +87,7 @@ app.use((err, req, res, next) => {
 })
 
 app.listen(PORT, () => {
-  console.log(`CareCircle server running on http://localhost:${PORT}`)
+  console.log(`My CareCircle server running on http://localhost:${PORT}`)
 })
 
 // ── Weekly digest cron ───────────────────────────────────────────────────────

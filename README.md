@@ -1,4 +1,4 @@
-# The CareCircle
+# My CareCircle
 
 A family caregiver coordination platform that helps multiple family members stay in sync around a shared care recipient. Powered by an AI guide called Willow who helps onboard caregivers, generate weekly summaries, and surface what matters most.
 
