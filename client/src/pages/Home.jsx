@@ -7,10 +7,34 @@ import { useCircle } from '../context/CircleContext'
 import api from '../services/api'
 import LogEntryCard from '../components/ui/LogEntryCard'
 
+// Status display tokens — use new palette
 const statusConfig = {
-  green:  { label: 'Good day',   bg: 'bg-green-50',  border: 'border-green-200',  dot: 'bg-green-500',  text: 'text-green-700' },
-  yellow: { label: 'Okay day',   bg: 'bg-amber-light', border: 'border-amber',    dot: 'bg-amber',      text: 'text-amber' },
-  red:    { label: 'Tough day',  bg: 'bg-rose-light', border: 'border-rose',      dot: 'bg-rose',       text: 'text-rose' },
+  green:  { label: 'Good day',  bg: 'bg-status-green/10',  border: 'border-status-green/30',  dot: 'bg-status-green',  text: 'text-status-green' },
+  yellow: { label: 'Okay day',  bg: 'bg-status-yellow/10', border: 'border-status-yellow/30', dot: 'bg-status-yellow', text: 'text-status-yellow' },
+  red:    { label: 'Tough day', bg: 'bg-status-red/10',    border: 'border-status-red/30',    dot: 'bg-status-red',    text: 'text-status-red' },
+}
+
+// Mini landscape for the hero card
+function HeroLandscape() {
+  return (
+    <svg
+      viewBox="0 0 400 70"
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="xMidYMax slice"
+      className="w-full block"
+      aria-hidden="true"
+    >
+      <path d="M0 48 Q90 26 200 38 Q310 50 400 28 L400 70 L0 70 Z" fill="#2d4a6e" opacity="0.5" />
+      <path d="M0 56 Q110 38 230 50 Q330 60 400 44 L400 70 L0 70 Z" fill="#1e3a4a" />
+      <path d="M0 63 Q140 52 270 60 Q350 64 400 54 L400 70 L0 70 Z" fill="#152435" />
+      <g fill="#0f1f30">
+        <polygon points="20,58 28,42 36,58" />
+        <polygon points="34,59 43,45 52,59" />
+        <polygon points="318,50 327,34 336,50" />
+        <polygon points="335,52 345,38 355,52" />
+      </g>
+    </svg>
+  )
 }
 
 export default function Home() {
@@ -73,14 +97,13 @@ export default function Home() {
   if (!circleLoading && !recipient) {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <div className="text-4xl mb-4">🌿</div>
-        <h2 className="text-lg font-semibold text-charcoal mb-2">Welcome to CareCircle</h2>
-        <p className="text-mid text-sm mb-6 max-w-xs">
-          Set up your care circle so the whole family can stay in sync.
+        <p className="font-display text-2xl text-night mb-2">The CareCircle</p>
+        <p className="text-mist text-sm mb-6 max-w-xs">
+          Set up your care circle so the whole team can stay in sync.
         </p>
         <button
           onClick={() => navigate('/onboarding')}
-          className="bg-sage text-white px-6 py-3 rounded-xl font-medium text-sm hover:bg-sage-light transition-colors"
+          className="bg-gradient-sage text-white px-8 py-3 rounded-full font-medium text-sm hover:opacity-90 transition-opacity shadow-sage"
         >
           Set Up Your Circle
         </button>
@@ -91,115 +114,133 @@ export default function Home() {
   const sc = todayStatus ? statusConfig[todayStatus.status] : null
 
   return (
-    <div className="p-4 lg:p-6 max-w-2xl mx-auto space-y-5">
-      {/* Greeting */}
-      <div>
-        <h1 className="text-xl font-semibold text-charcoal">
-          {recipient ? `Caring for ${recipient.full_name}` : 'Home'}
-        </h1>
-        <p className="text-sm text-mid mt-0.5">
-          {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-        </p>
+    <div className="max-w-2xl mx-auto space-y-4 pb-6">
+
+      {/* Hero card — night-sky gradient with landscape */}
+      <div className="bg-gradient-night overflow-hidden">
+        {/* Text area */}
+        <div className="px-5 pt-6 pb-2">
+          <p className="text-mist text-xs font-medium uppercase tracking-widest mb-1">
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+          </p>
+          <h1 className="font-display text-2xl text-cloud font-medium leading-snug">
+            {recipient ? `Caring for ${recipient.full_name}` : 'Home'}
+          </h1>
+
+          {/* Status row */}
+          <div className="flex items-center justify-between mt-3 mb-4">
+            <div className="flex items-center gap-2">
+              {sc ? (
+                <>
+                  <span className={`w-2.5 h-2.5 rounded-full ${sc.dot}`} />
+                  <span className="text-sm text-cloud font-medium">{sc.label}</span>
+                  {todayStatus.note && (
+                    <span className="text-xs text-mist ml-0.5">— {todayStatus.note}</span>
+                  )}
+                </>
+              ) : (
+                <span className="text-sm text-mist">No check-in today</span>
+              )}
+            </div>
+            <button
+              onClick={() => navigate('/status')}
+              className="text-xs text-mist hover:text-cloud underline transition-colors"
+            >
+              {sc ? 'Update' : 'Check in'}
+            </button>
+          </div>
+        </div>
+        {/* SVG landscape at the bottom of the card */}
+        <HeroLandscape />
       </div>
 
-      {/* Today's status card */}
-      <div
-        className={`rounded-2xl border p-4 ${sc ? `${sc.bg} ${sc.border}` : 'bg-white border-border'}`}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {sc ? (
-              <>
-                <span className={`w-3 h-3 rounded-full ${sc.dot}`} />
-                <span className={`font-medium text-sm ${sc.text}`}>{sc.label}</span>
-                {todayStatus.note && (
-                  <span className="text-xs text-mid ml-1">— {todayStatus.note}</span>
-                )}
-              </>
-            ) : (
-              <span className="text-sm text-mid">No check-in today</span>
-            )}
+      {/* Page content */}
+      <div className="px-4 lg:px-6 space-y-4">
+
+        {/* Catch Me Up */}
+        <button
+          onClick={handleCatchUp}
+          className="w-full flex items-center justify-center gap-2 bg-white rounded-card shadow-card py-3.5 px-4 text-sm font-medium text-night hover:shadow-card-md transition-shadow"
+        >
+          <Sparkles size={16} className="text-sage" />
+          Catch Me Up
+        </button>
+
+        {/* Recent entries */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-semibold text-night text-sm">Recent Updates</h2>
+            <button onClick={() => navigate('/log')} className="text-xs text-sage hover:underline">See all</button>
           </div>
-          <button
-            onClick={() => navigate('/status')}
-            className="text-xs text-sage font-medium hover:underline"
-          >
-            {sc ? 'Update' : 'Check in'}
-          </button>
+          {loading ? (
+            <div className="space-y-2">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-20 bg-white rounded-card animate-pulse shadow-card" />
+              ))}
+            </div>
+          ) : entries.length === 0 ? (
+            <div className="bg-white rounded-card shadow-card p-6 text-center">
+              <p className="text-sm text-mist">No entries yet.</p>
+              <button onClick={() => navigate('/log/new')} className="text-sm text-sage mt-1 hover:underline">
+                Add the first one
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {entries.map((entry) => (
+                <LogEntryCard
+                  key={entry.id}
+                  entry={entry}
+                  currentUserId={user?.id}
+                  onEdit={handleEditEntry}
+                  onDelete={handleDeleteEntry}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Catch Me Up */}
-      <button
-        onClick={handleCatchUp}
-        className="w-full flex items-center justify-center gap-2 bg-white border border-border rounded-2xl py-3 px-4 text-sm font-medium text-charcoal hover:bg-cream transition-colors shadow-sm"
-      >
-        <Sparkles size={16} className="text-sage" />
-        Catch Me Up
-      </button>
-
-      {/* Catch Me Up Modal */}
+      {/* Catch Me Up — bottom sheet */}
       {catchUpOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="absolute inset-0 bg-charcoal/40 backdrop-blur-sm" onClick={() => setCatchUpOpen(false)} />
-          <div className="relative w-full max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-5">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-semibold text-charcoal flex items-center gap-2">
+          <div
+            className="absolute inset-0 bg-night/50 backdrop-blur-sm"
+            onClick={() => setCatchUpOpen(false)}
+          />
+          <div className="relative w-full max-w-lg bg-white rounded-sheet sm:rounded-card shadow-card-md">
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-1 sm:hidden">
+              <div className="w-10 h-1 bg-cloud rounded-full" />
+            </div>
+            <div className="flex items-center justify-between px-5 pt-3 sm:pt-5 pb-3 border-b border-border">
+              <h2 className="font-semibold text-night flex items-center gap-2">
                 <Sparkles size={16} className="text-sage" /> Last 14 days
               </h2>
-              <button onClick={() => setCatchUpOpen(false)} className="text-mid hover:text-charcoal">
+              <button
+                onClick={() => setCatchUpOpen(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-dawn text-mist transition-colors"
+              >
                 <X size={18} />
               </button>
             </div>
-            {catchUpLoading ? (
-              <div className="flex items-center justify-center py-10">
-                <div className="w-6 h-6 border-2 border-sage border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : (
-              <p className="text-sm text-charcoal leading-relaxed whitespace-pre-wrap">{catchUpText}</p>
-            )}
+            <div className="p-5 max-h-[60vh] overflow-y-auto">
+              {catchUpLoading ? (
+                <div className="flex items-center justify-center py-10">
+                  <div className="w-6 h-6 border-2 border-sage border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : (
+                <p className="text-sm text-night leading-relaxed whitespace-pre-wrap">{catchUpText}</p>
+              )}
+            </div>
           </div>
         </div>
       )}
 
-      {/* Recent entries */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold text-charcoal text-sm">Recent Updates</h2>
-          <button onClick={() => navigate('/log')} className="text-xs text-sage hover:underline">See all</button>
-        </div>
-        {loading ? (
-          <div className="space-y-2">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-20 bg-white rounded-xl animate-pulse border border-border" />
-            ))}
-          </div>
-        ) : entries.length === 0 ? (
-          <div className="bg-white rounded-xl border border-border p-6 text-center">
-            <p className="text-sm text-mid">No entries yet.</p>
-            <button onClick={() => navigate('/log/new')} className="text-sm text-sage mt-1 hover:underline">
-              Add the first one
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {entries.map((entry) => (
-              <LogEntryCard
-                key={entry.id}
-                entry={entry}
-                currentUserId={user?.id}
-                onEdit={handleEditEntry}
-                onDelete={handleDeleteEntry}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
       {/* FAB */}
       <button
         onClick={() => navigate('/log/new')}
-        className="fixed bottom-20 right-5 lg:bottom-8 lg:right-8 w-14 h-14 bg-sage text-white rounded-full shadow-lg flex items-center justify-center hover:bg-sage-light transition-colors z-30"
+        className="fixed bottom-20 right-5 lg:bottom-8 lg:right-8 w-14 h-14 bg-gradient-sage text-white rounded-full shadow-sage flex items-center justify-center hover:opacity-90 transition-opacity z-30"
         aria-label="Add log entry"
       >
         <Plus size={24} />

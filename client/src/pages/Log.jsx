@@ -27,7 +27,6 @@ export default function Log() {
   const [searchInput, setSearchInput] = useState('')
   const [editEntry, setEditEntry] = useState(null)
 
-  // Open edit modal if ?edit= param exists
   useEffect(() => {
     const editId = searchParams.get('edit')
     if (editId && entries.length > 0) {
@@ -83,7 +82,7 @@ export default function Log() {
   if (!recipient) {
     return (
       <div className="p-6 text-center">
-        <p className="text-mid text-sm">Set up your care circle first.</p>
+        <p className="text-mist text-sm">Set up your care circle first.</p>
         <button onClick={() => navigate('/onboarding')} className="text-sage text-sm mt-2 hover:underline">
           Get started
         </button>
@@ -94,36 +93,39 @@ export default function Log() {
   return (
     <div className="p-4 lg:p-6 max-w-2xl mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-semibold text-charcoal">Care Log</h1>
+        <h1 className="text-xl font-semibold text-night">Care Log</h1>
         <button
           onClick={() => navigate('/log/new')}
-          className="flex items-center gap-1.5 bg-sage text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-sage-light transition-colors"
+          className="flex items-center gap-1.5 bg-gradient-sage text-white px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-sage"
         >
-          <Plus size={16} /> Add Entry
+          <Plus size={15} /> Add Entry
         </button>
       </div>
 
       {/* Search */}
       <form onSubmit={handleSearch} className="flex gap-2 mb-4">
         <div className="flex-1 relative">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-mid" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-mist" />
           <input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search entries…"
-            className="w-full pl-8 pr-3 py-2 rounded-lg border border-border text-sm outline-none focus:ring-2 focus:ring-sage bg-white"
+            className="w-full pl-8 pr-3 py-2 rounded-xl border border-cloud text-sm text-night outline-none focus:ring-2 focus:ring-sage bg-white"
           />
         </div>
         {search && (
-          <button type="button" onClick={() => { setSearch(''); setSearchInput(''); setPage(1) }}
-            className="px-3 py-2 rounded-lg border border-border bg-white text-mid hover:bg-cream">
+          <button
+            type="button"
+            onClick={() => { setSearch(''); setSearchInput(''); setPage(1) }}
+            className="px-3 py-2 rounded-xl border border-cloud bg-white text-mist hover:bg-dawn"
+          >
             <X size={15} />
           </button>
         )}
       </form>
 
       {/* Category filters */}
-      <div className="flex gap-2 overflow-x-auto pb-1 mb-4 scrollbar-hide">
+      <div className="flex gap-2 overflow-x-auto pb-1 mb-4">
         {CATEGORIES.map((cat) => (
           <button
             key={cat}
@@ -131,7 +133,7 @@ export default function Log() {
             className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
               category === cat
                 ? 'bg-sage text-white'
-                : 'bg-white border border-border text-mid hover:bg-cream'
+                : 'bg-white border border-cloud text-mist hover:bg-dawn'
             }`}
           >
             {CAT_LABELS[cat]}
@@ -143,12 +145,12 @@ export default function Log() {
       {loading ? (
         <div className="space-y-3">
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="h-24 bg-white rounded-xl animate-pulse border border-border" />
+            <div key={i} className="h-24 bg-white rounded-card animate-pulse shadow-card" />
           ))}
         </div>
       ) : entries.length === 0 ? (
-        <div className="bg-white rounded-xl border border-border p-10 text-center">
-          <p className="text-mid text-sm">No entries found.</p>
+        <div className="bg-white rounded-card shadow-card p-10 text-center">
+          <p className="text-mist text-sm">No entries found.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -170,22 +172,22 @@ export default function Log() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 rounded-lg border border-border text-sm disabled:opacity-40 hover:bg-cream bg-white"
+            className="px-4 py-2 rounded-full border border-cloud text-sm text-night disabled:opacity-40 hover:bg-dawn bg-white"
           >
             Previous
           </button>
-          <span className="text-sm text-mid">{page} / {totalPages}</span>
+          <span className="text-sm text-mist">{page} / {totalPages}</span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-4 py-2 rounded-lg border border-border text-sm disabled:opacity-40 hover:bg-cream bg-white"
+            className="px-4 py-2 rounded-full border border-cloud text-sm text-night disabled:opacity-40 hover:bg-dawn bg-white"
           >
             Next
           </button>
         </div>
       )}
 
-      {/* Edit modal */}
+      {/* Edit bottom sheet */}
       <Modal isOpen={!!editEntry} onClose={() => setEditEntry(null)} title="Edit Entry">
         {editEntry && (
           <LogEntryForm
@@ -199,7 +201,7 @@ export default function Log() {
       {/* FAB */}
       <button
         onClick={() => navigate('/log/new')}
-        className="fixed bottom-20 right-5 lg:bottom-8 lg:right-8 w-14 h-14 bg-sage text-white rounded-full shadow-lg flex items-center justify-center hover:bg-sage-light transition-colors z-30 lg:hidden"
+        className="fixed bottom-20 right-5 lg:bottom-8 lg:right-8 w-14 h-14 bg-gradient-sage text-white rounded-full shadow-sage flex items-center justify-center hover:opacity-90 transition-opacity z-30 lg:hidden"
         aria-label="Add log entry"
       >
         <Plus size={24} />

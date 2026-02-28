@@ -53,36 +53,21 @@ export default function Onboarding() {
   const inputRef = useRef(null)
   const recipientIdRef = useRef(null)
   const willowStarted = useRef(false)
-  const voiceModeRef = useRef(false)       // readable inside callbacks
-  const wasStreamingRef = useRef(false)    // track streaming transitions
-  // StrictMode guard: prevents the double-invoked state-updater from firing
-  // two concurrent POST /circle/create requests before the first resolves.
+  const voiceModeRef = useRef(false)
+  const wasStreamingRef = useRef(false)
   const syncInProgressRef = useRef(false)
 
   useEffect(() => { voiceModeRef.current = voiceMode }, [voiceMode])
-
   useEffect(() => { recipientIdRef.current = recipientId }, [recipientId])
 
-  // Already onboarded → go home, but ONLY if:
+  // Already onboarded → go home, but only if:
   //   (a) the chat hasn't started yet (messages still empty), AND
   //   (b) the user didn't arrive via "Add another person" (?new=true).
-  // Once refresh() fires mid-conversation `recipient` becomes truthy, but we
-  // should NOT redirect then either — the user needs to hit "Finish Setup →".
   useEffect(() => {
     if (recipient && messages.length === 0 && !isNew) navigate('/home', { replace: true })
   }, [recipient, messages.length, isNew, navigate])
 
-  // Willow's opening message.
-  //
-  // React 18 StrictMode double-invokes effects in development: it mounts,
-  // runs effects, then unmounts (running cleanups), then remounts and runs
-  // effects again.  The cleanup's AbortController.abort() fires synchronously
-  // — before any async fetch response can arrive — so the first (stale)
-  // sendToWillow call exits silently.  The second invoke gets a fresh
-  // controller and proceeds normally.
-  //
-  // Gating on `user` (not `[]`) ensures cc_access_token is guaranteed to be
-  // in localStorage (it's set before dispatch(SET_SESSION) in AuthContext).
+  // Willow's opening message — gated on `user` to ensure token is available.
   useEffect(() => {
     if (!user) return
     if (willowStarted.current) return
@@ -93,7 +78,7 @@ export default function Onboarding() {
 
     return () => {
       controller.abort()
-      willowStarted.current = false  // reset so the second StrictMode mount can fire
+      willowStarted.current = false
     }
   }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -103,7 +88,6 @@ export default function Onboarding() {
 
   const { isListening, isSupported, startListening, stopListening } = useVoiceInput((transcript) => {
     if (voiceModeRef.current) {
-      // Voice mode: auto-send immediately without requiring a button tap
       sendMessage(transcript)
     } else {
       setInput((prev) => prev + (prev ? ' ' : '') + transcript)
@@ -121,8 +105,6 @@ export default function Onboarding() {
     wasStreamingRef.current = isStreaming
   }, [isStreaming, startListening])
 
-  // signal is optional — only passed by the Willow init effect so StrictMode
-  // can cancel the stale first-mount request before it shows an error toast.
   async function sendToWillow(conversationMessages, signal = null) {
     setIsStreaming(true)
     const newMsgIndex = conversationMessages.length
@@ -182,24 +164,14 @@ export default function Onboarding() {
         })
       }
     } catch (err) {
-      // AbortError = stale StrictMode first-mount invocation — exit silently.
       if (err.name !== 'AbortError' && !signal?.aborted) {
         toast.error('Willow is unavailable. Please try again.')
       }
     } finally {
-      // Only clean up shared UI state if this invocation was NOT aborted.
-      // For the aborted (stale StrictMode first-mount) case, the second
-      // invocation's setMessages call at its start already removes any
-      // dangling streaming bubble, and it manages isStreaming itself.
-      // Skipping here prevents the aborted finally from clobbering the
-      // second invocation's isStreaming=true while it's still streaming.
       if (!signal?.aborted) {
         setMessages((prev) => prev.filter((m) => !m.streaming))
         setIsStreaming(false)
         setTimeout(() => inputRef.current?.focus(), 100)
-        // Sync CircleContext so showFinish can use `recipient` as a fallback
-        // even if syncToDatabase silently failed or the <extract> block was
-        // missing — any circle that was created will now be reflected.
         refresh()
       }
     }
@@ -209,10 +181,6 @@ export default function Onboarding() {
     if (!data.recipient_name) return
     try {
       if (!currentRecipientId) {
-        // Guard against StrictMode double-invoking the state updater that calls
-        // this function. Both invocations run synchronously before any await,
-        // so setting the flag here prevents the second from firing a duplicate
-        // POST /circle/create.
         if (syncInProgressRef.current) return
         syncInProgressRef.current = true
         try {
@@ -229,8 +197,6 @@ export default function Onboarding() {
           for (const med of data.medications) {
             await api.post('/medications', { recipient_id: newId, name: med }).catch(() => {})
           }
-          // Save suggested helpers separately — fire-and-forget so a missing
-          // DB column (pre-migration) never breaks the core circle creation.
           if (data.family_members?.length) {
             api.patch('/circle/recipient', {
               recipient_id: newId,
@@ -249,8 +215,6 @@ export default function Onboarding() {
           conditions: data.conditions,
           allergies: data.allergies,
         }).catch(() => {})
-        // Save suggested helpers separately — fire-and-forget so a missing
-        // DB column (pre-migration) never affects the core profile update.
         if (data.family_members?.length) {
           api.patch('/circle/recipient', {
             recipient_id: currentRecipientId,
@@ -270,9 +234,7 @@ export default function Onboarding() {
     sendToWillow(history.map(({ role, content }) => ({ role, content })))
   }
 
-  function handleSend() {
-    sendMessage(input.trim())
-  }
+  function handleSend() { sendMessage(input.trim()) }
 
   function toggleVoiceMode() {
     if (voiceMode) {
@@ -286,14 +248,8 @@ export default function Onboarding() {
 
   async function handleFinish() {
     let activeId = recipientId || recipient?.id
-
-    // Build the best data we have so far from the in-memory extracted state.
     let dataToSave = { ...extractedData }
 
-    // --- Server-side extraction fallback ---
-    // If the mid-stream <extract> blocks never populated a recipient_name
-    // (e.g. the model skipped the block, or the user had an older session),
-    // ask the server to read the full conversation and extract data fresh.
     const userMessages = messages.filter((m) => m.role === 'user')
     if (!dataToSave.recipient_name && userMessages.length > 0) {
       try {
@@ -304,13 +260,11 @@ export default function Onboarding() {
         })
         if (extractRes?.extracted) {
           dataToSave = mergeExtracted(dataToSave, extractRes.extracted)
-          // Update React state so the app reflects the recovered data.
           setExtractedData(dataToSave)
         }
-      } catch { /* extraction failed — proceed with whatever we have */ }
+      } catch { /* proceed with whatever we have */ }
     }
 
-    // --- Create circle if it doesn't exist yet ---
     if (!activeId && dataToSave.recipient_name) {
       try {
         const { data: res } = await api.post('/circle/create', {
@@ -323,8 +277,6 @@ export default function Onboarding() {
         activeId = res.recipient.id
         setRecipientId(activeId)
         recipientIdRef.current = activeId
-
-        // Save medications that were collected during the conversation.
         for (const med of dataToSave.medications) {
           await api.post('/medications', { recipient_id: activeId, name: med }).catch(() => {})
         }
@@ -332,8 +284,6 @@ export default function Onboarding() {
     }
 
     if (activeId) {
-      // selectRecipient persists the new ID, reloads circle data, and refreshes
-      // the recipients list so the switcher immediately shows the new person.
       await selectRecipient(activeId)
     } else {
       await refresh()
@@ -341,42 +291,44 @@ export default function Onboarding() {
     navigate('/home')
   }
 
-  // Show "Finish Setup →" as soon as the user has sent at least one message
-  // and nothing is streaming.  We intentionally do NOT require a confirmed
-  // DB write here — if syncToDatabase silently failed the user would otherwise
-  // be stranded on this screen with no escape route.
   const userHasSentMessage = messages.some((m) => m.role === 'user')
   const showFinish = userHasSentMessage && !isStreaming
 
   return (
-    <div className="min-h-screen bg-cream">
-      {/* Header — sticky so it stays visible while scrolling */}
-      <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-white border-b border-border">
+    <div className="min-h-screen bg-dawn">
+      {/* Header — forest gradient, sticky */}
+      <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 bg-gradient-forest shadow-twilight">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-sage rounded-full flex items-center justify-center text-white">🌿</div>
+          <div className="w-9 h-9 bg-white/15 rounded-full flex items-center justify-center text-white font-display text-base shrink-0">
+            🌿
+          </div>
           <div>
-            <p className="text-sm font-semibold text-charcoal leading-none">Willow</p>
-            <p className="text-xs text-mid mt-0.5">Your My Care Circle guide</p>
+            <p className="text-sm font-semibold text-white leading-none">Willow</p>
+            <p className="text-xs text-sage-pale mt-0.5">Your CareCircle guide</p>
           </div>
         </div>
-        <button onClick={() => navigate('/home')} className="text-sm text-mid hover:text-charcoal underline">
+        <button
+          onClick={() => navigate('/home')}
+          className="text-sm text-sage-pale hover:text-white transition-colors"
+        >
           Set up later
         </button>
       </div>
 
-      {/* Messages — natural height, page scrolls */}
-      {/* pt-16 (64px) offsets the ~60px sticky header so the first message isn't hidden behind it */}
+      {/* Messages — pt-16 offsets the sticky ~60px header */}
       <div className="px-4 pt-16 pb-4 space-y-3">
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
-              <div className="w-7 h-7 bg-sage rounded-full flex items-center justify-center text-sm shrink-0 mt-1">🌿</div>
+              <div className="w-7 h-7 bg-gradient-forest rounded-full flex items-center justify-center text-sm shrink-0 mt-1">
+                🌿
+              </div>
             )}
             <div
               className={`max-w-[78%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-sage text-white rounded-br-sm'
-                  : 'bg-white text-charcoal border border-border rounded-bl-sm shadow-sm'
+                  ? 'bg-gradient-sage text-white rounded-br-sm shadow-sage'
+                  : 'bg-white text-night border border-border rounded-bl-sm shadow-card'
               }`}
             >
               {msg.content || (
@@ -401,24 +353,24 @@ export default function Onboarding() {
         <div className="px-4 pb-2">
           <button
             onClick={handleFinish}
-            className="w-full bg-sage text-white py-3 rounded-xl font-medium text-sm hover:bg-sage-light transition-colors"
+            className="w-full bg-gradient-sage text-white py-3.5 rounded-full font-medium text-sm hover:opacity-90 transition-opacity shadow-sage"
           >
             Finish Setup →
           </button>
         </div>
       )}
 
-      {/* Input bar — inline below messages, not fixed */}
+      {/* Input bar */}
       <div className="bg-white border-t border-border px-3 py-3 space-y-2">
 
         {/* Voice mode status banner */}
         {voiceMode && (
-          <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${
+          <div className={`flex items-center gap-2 px-3 py-2 rounded-xl ${
             isListening
               ? 'bg-rose/10 border border-rose/20'
               : isStreaming
               ? 'bg-sage/10 border border-sage/20'
-              : 'bg-cream border border-border'
+              : 'bg-dawn border border-border'
           }`}>
             {isListening ? (
               <>
@@ -436,12 +388,12 @@ export default function Onboarding() {
                     <span key={d} className="w-1.5 h-1.5 bg-sage rounded-full animate-bounce" style={{ animationDelay: `${d}ms` }} />
                   ))}
                 </span>
-                <span className="text-xs font-medium text-sage">Willow is responding… mic will restart automatically</span>
+                <span className="text-xs font-medium text-sage">Willow is responding…</span>
               </>
             ) : (
               <>
-                <Mic size={13} className="text-mid" />
-                <span className="text-xs text-mid">Voice mode on — mic restarts after each response</span>
+                <Mic size={13} className="text-mist" />
+                <span className="text-xs text-mist">Voice mode on — mic restarts after each response</span>
               </>
             )}
           </div>
@@ -456,7 +408,7 @@ export default function Onboarding() {
             placeholder={voiceMode ? 'Speaking hands-free — or type here…' : 'Type your message…'}
             rows={1}
             disabled={isStreaming}
-            className="flex-1 resize-none rounded-xl border border-border px-3 py-2.5 text-sm text-charcoal outline-none focus:ring-2 focus:ring-sage max-h-28"
+            className="flex-1 resize-none rounded-xl border border-border px-3 py-2.5 text-sm text-night outline-none focus:ring-2 focus:ring-sage max-h-28"
           />
 
           {/* Single-tap mic (non-voice-mode only) */}
@@ -466,7 +418,7 @@ export default function Onboarding() {
               disabled={isStreaming}
               aria-label="Voice input"
               className={`w-10 h-10 flex items-center justify-center rounded-xl transition-colors ${
-                isListening ? 'bg-rose text-white' : 'bg-cream hover:bg-cream-dark text-mid'
+                isListening ? 'bg-rose text-white' : 'bg-dawn hover:bg-cloud text-mist'
               }`}
             >
               {isListening ? <MicOff size={18} /> : <Mic size={18} />}
@@ -493,7 +445,7 @@ export default function Onboarding() {
             onClick={handleSend}
             disabled={!input.trim() || isStreaming}
             aria-label="Send"
-            className="w-10 h-10 flex items-center justify-center rounded-xl bg-sage text-white disabled:opacity-40 hover:bg-sage-light transition-colors"
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-sage text-white disabled:opacity-40 hover:opacity-90 transition-opacity"
           >
             <Send size={18} />
           </button>

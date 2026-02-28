@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
 import { X } from 'lucide-react'
 
+// On mobile: slides up as a bottom sheet (rounded-sheet corners)
+// On sm+: centred dialog
 export default function Modal({ isOpen, onClose, title, children, maxWidth = 'max-w-lg' }) {
   // Lock body scroll while open
   useEffect(() => {
@@ -19,19 +21,24 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
     >
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-charcoal/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-night/50 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Panel */}
-      <div className={`relative w-full ${maxWidth} bg-white rounded-t-2xl sm:rounded-2xl shadow-xl max-h-[92vh] flex flex-col`}>
+      {/* Panel — bottom sheet on mobile, centred card on sm+ */}
+      <div className={`relative w-full ${maxWidth} bg-white rounded-sheet sm:rounded-card shadow-card-md max-h-[92vh] flex flex-col`}>
+        {/* Handle bar (mobile only) */}
+        <div className="flex justify-center pt-3 pb-1 sm:hidden shrink-0">
+          <div className="w-10 h-1 bg-cloud rounded-full" />
+        </div>
+
         {/* Header */}
         {title && (
-          <div className="flex items-center justify-between px-5 pt-5 pb-3 border-b border-border shrink-0">
-            <h2 className="text-base font-semibold text-charcoal">{title}</h2>
+          <div className="flex items-center justify-between px-5 pt-3 pb-3 sm:pt-5 border-b border-border shrink-0">
+            <h2 className="text-base font-semibold text-night">{title}</h2>
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-cream transition-colors text-mid"
+              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-dawn transition-colors text-mist"
               aria-label="Close"
             >
               <X size={18} />
@@ -41,7 +48,7 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
         {!title && (
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-cream transition-colors text-mid z-10"
+            className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-dawn transition-colors text-mist z-10"
             aria-label="Close"
           >
             <X size={18} />

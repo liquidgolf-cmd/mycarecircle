@@ -9,7 +9,7 @@ import api from '../services/api'
 const ROLE_META = {
   admin:       { label: 'Admin',       icon: Crown,  color: 'text-sage',  bg: 'bg-sage/10'  },
   contributor: { label: 'Contributor', icon: Pencil, color: 'text-amber', bg: 'bg-amber/10' },
-  viewer:      { label: 'Viewer',      icon: Eye,    color: 'text-mid',   bg: 'bg-cream'    },
+  viewer:      { label: 'Viewer',      icon: Eye,    color: 'text-mist',  bg: 'bg-dawn'     },
 }
 
 function MemberAvatar({ name }) {
@@ -20,7 +20,7 @@ function MemberAvatar({ name }) {
     .join('')
     .toUpperCase()
   return (
-    <div className="w-9 h-9 rounded-full bg-sage text-white flex items-center justify-center text-sm font-semibold shrink-0">
+    <div className="w-9 h-9 rounded-full bg-twilight text-cloud flex items-center justify-center text-sm font-semibold shrink-0">
       {initials}
     </div>
   )
@@ -143,11 +143,11 @@ export default function Circle() {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
         <div className="text-4xl mb-4">🌿</div>
-        <h2 className="text-lg font-semibold text-charcoal mb-2">No care circle yet</h2>
-        <p className="text-mid text-sm mb-6">Set up a circle first to start inviting family members.</p>
+        <h2 className="text-lg font-semibold text-night mb-2">No care circle yet</h2>
+        <p className="text-mist text-sm mb-6">Set up a circle first to start inviting family members.</p>
         <button
           onClick={() => navigate('/onboarding')}
-          className="bg-sage text-white px-6 py-3 rounded-xl font-medium text-sm hover:bg-sage-light transition-colors"
+          className="bg-gradient-sage text-white px-6 py-3 rounded-full font-medium text-sm hover:opacity-90 transition-opacity shadow-sage"
         >
           Set Up Circle
         </button>
@@ -160,15 +160,15 @@ export default function Circle() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-charcoal">Care Circle</h1>
-          <p className="text-sm text-mid mt-0.5">
+          <h1 className="text-xl font-semibold text-night">Care Circle</h1>
+          <p className="text-sm text-mist mt-0.5">
             Caring for <strong>{recipient.full_name}</strong>
           </p>
         </div>
         {isAdmin && (
           <button
             onClick={() => setShowInviteForm((v) => !v)}
-            className="flex items-center gap-1.5 bg-sage text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-sage-light transition-colors"
+            className="flex items-center gap-1.5 bg-gradient-sage text-white px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-sage"
           >
             <UserPlus size={15} />
             Invite
@@ -178,11 +178,11 @@ export default function Circle() {
 
       {/* Invite form (admin-only, toggled) */}
       {showInviteForm && (
-        <div className="bg-white rounded-2xl border border-border p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-charcoal mb-4">Invite a family member</h2>
+        <div className="bg-white rounded-card shadow-card p-5">
+          <h2 className="text-sm font-semibold text-night mb-4">Invite a family member</h2>
           <form onSubmit={handleInvite} className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-mid mb-1 uppercase tracking-wide">
+              <label className="block text-xs font-medium text-mist mb-1.5 uppercase tracking-wide">
                 Name
               </label>
               <input
@@ -190,11 +190,11 @@ export default function Circle() {
                 value={inviteName}
                 onChange={(e) => setInviteName(e.target.value)}
                 placeholder="Jane Smith"
-                className="w-full rounded-lg border border-border px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sage"
+                className="w-full rounded-xl border border-cloud px-3 py-2.5 text-sm text-night outline-none focus:ring-2 focus:ring-sage"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-mid mb-1 uppercase tracking-wide">
+              <label className="block text-xs font-medium text-mist mb-1.5 uppercase tracking-wide">
                 Email address
               </label>
               <input
@@ -203,17 +203,17 @@ export default function Circle() {
                 onChange={(e) => setInviteEmail(e.target.value)}
                 required
                 placeholder="jane@example.com"
-                className="w-full rounded-lg border border-border px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sage"
+                className="w-full rounded-xl border border-cloud px-3 py-2.5 text-sm text-night outline-none focus:ring-2 focus:ring-sage"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-mid mb-1 uppercase tracking-wide">
+              <label className="block text-xs font-medium text-mist mb-1.5 uppercase tracking-wide">
                 Role
               </label>
               <select
                 value={inviteRole}
                 onChange={(e) => setInviteRole(e.target.value)}
-                className="w-full rounded-lg border border-border px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sage bg-white"
+                className="w-full rounded-xl border border-cloud px-3 py-2.5 text-sm text-night outline-none focus:ring-2 focus:ring-sage bg-white"
               >
                 <option value="admin">Admin — full access including circle management</option>
                 <option value="contributor">Contributor — can add entries and status</option>
@@ -224,14 +224,14 @@ export default function Circle() {
               <button
                 type="button"
                 onClick={() => setShowInviteForm(false)}
-                className="flex-1 py-2.5 rounded-xl border border-border text-sm font-medium text-charcoal hover:bg-cream transition-colors"
+                className="flex-1 py-2.5 rounded-full border border-cloud text-sm font-medium text-night hover:bg-dawn transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={sending || !inviteEmail.trim()}
-                className="flex-1 py-2.5 rounded-xl bg-sage text-white text-sm font-medium hover:bg-sage-light disabled:opacity-50 transition-colors"
+                className="flex-1 py-2.5 rounded-full bg-gradient-sage text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
               >
                 {sending ? 'Sending…' : 'Send Invite'}
               </button>
@@ -243,33 +243,33 @@ export default function Circle() {
       {/* Suggested helpers from onboarding — admin only */}
       {isAdmin && localSuggestions.length > 0 && (
         <section>
-          <h2 className="text-xs font-semibold text-mid uppercase tracking-wide mb-1">
+          <h2 className="text-xs font-semibold text-mist uppercase tracking-wide mb-1">
             Suggested Helpers
           </h2>
-          <p className="text-xs text-mid mb-3">
+          <p className="text-xs text-mist mb-3">
             Mentioned during your setup — invite them to join {recipient.full_name}'s circle.
           </p>
           <div className="space-y-2">
             {localSuggestions.map((name) => (
               <div
                 key={name}
-                className="bg-white rounded-xl border border-sage/30 px-4 py-3 flex items-center gap-3"
+                className="bg-white rounded-card shadow-card border border-sage/20 px-4 py-3 flex items-center gap-3"
               >
                 <MemberAvatar name={name} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-charcoal truncate">{name}</p>
-                  <p className="text-xs text-mid">From your setup conversation</p>
+                  <p className="text-sm font-medium text-night truncate">{name}</p>
+                  <p className="text-xs text-mist">From your setup conversation</p>
                 </div>
                 <button
                   onClick={() => handleInviteSuggestion(name)}
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-sage text-white text-xs font-medium hover:bg-sage-light transition-colors shrink-0"
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-sage text-white text-xs font-medium hover:opacity-90 transition-opacity shrink-0"
                 >
                   <UserPlus size={12} />
                   Invite
                 </button>
                 <button
                   onClick={() => handleRemoveSuggestion(name)}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-cream text-mid hover:text-charcoal transition-colors shrink-0"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-dawn text-mist hover:text-night transition-colors shrink-0"
                   aria-label={`Remove ${name} from suggestions`}
                 >
                   <X size={14} />
@@ -282,7 +282,7 @@ export default function Circle() {
 
       {/* Members list */}
       <section>
-        <h2 className="text-xs font-semibold text-mid uppercase tracking-wide mb-3">
+        <h2 className="text-xs font-semibold text-mist uppercase tracking-wide mb-3">
           Members ({members.length})
         </h2>
         <div className="space-y-2">
@@ -292,14 +292,14 @@ export default function Circle() {
             return (
               <div
                 key={m.circle_id}
-                className="bg-white rounded-xl border border-border px-4 py-3 flex items-center gap-3"
+                className="bg-white rounded-card shadow-card px-4 py-3 flex items-center gap-3"
               >
                 <MemberAvatar name={displayName} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-charcoal truncate">
+                  <p className="text-sm font-medium text-night truncate">
                     {displayName}
                     {isYou && (
-                      <span className="ml-1.5 text-xs text-mid font-normal">(you)</span>
+                      <span className="ml-1.5 text-xs text-mist font-normal">(you)</span>
                     )}
                   </p>
                 </div>
@@ -313,7 +313,7 @@ export default function Circle() {
       {/* Pending invites — admin only */}
       {isAdmin && (
         <section>
-          <h2 className="text-xs font-semibold text-mid uppercase tracking-wide mb-3 flex items-center gap-2">
+          <h2 className="text-xs font-semibold text-mist uppercase tracking-wide mb-3 flex items-center gap-2">
             Pending Invites
             {invites.length > 0 && (
               <span className="bg-amber text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium">
@@ -324,45 +324,45 @@ export default function Circle() {
           {invitesLoading ? (
             <div className="space-y-2">
               {[1, 2].map((i) => (
-                <div key={i} className="h-14 bg-white rounded-xl border border-border animate-pulse" />
+                <div key={i} className="h-14 bg-white rounded-card shadow-card animate-pulse" />
               ))}
             </div>
           ) : invites.length === 0 ? (
-            <div className="bg-white rounded-xl border border-border p-6 text-center">
-              <Mail size={20} className="text-mid mx-auto mb-2" />
-              <p className="text-sm text-mid">No pending invites</p>
+            <div className="bg-white rounded-card shadow-card p-6 text-center">
+              <Mail size={20} className="text-mist mx-auto mb-2" />
+              <p className="text-sm text-mist">No pending invites</p>
             </div>
           ) : (
             <div className="space-y-2">
               {invites.map((inv) => (
                 <div
                   key={inv.id}
-                  className="bg-white rounded-xl border border-border px-4 py-3 flex items-center gap-3"
+                  className="bg-white rounded-card shadow-card px-4 py-3 flex items-center gap-3"
                 >
-                  <div className="w-9 h-9 rounded-full bg-cream border border-border flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-dawn border border-cloud flex items-center justify-center shrink-0">
                     {inv.name ? (
                       <span className="text-sm font-semibold text-sage">
                         {inv.name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()}
                       </span>
                     ) : (
-                      <Mail size={15} className="text-mid" />
+                      <Mail size={15} className="text-mist" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     {inv.name && (
-                      <p className="text-sm font-medium text-charcoal truncate">{inv.name}</p>
+                      <p className="text-sm font-medium text-night truncate">{inv.name}</p>
                     )}
-                    <p className={`truncate ${inv.name ? 'text-xs text-mid' : 'text-sm font-medium text-charcoal'}`}>
+                    <p className={`truncate ${inv.name ? 'text-xs text-mist' : 'text-sm font-medium text-night'}`}>
                       {inv.email}
                     </p>
-                    <p className="text-xs text-mid mt-0.5">
+                    <p className="text-xs text-mist mt-0.5">
                       Expires {new Date(inv.expires_at).toLocaleDateString()}
                     </p>
                   </div>
                   <RoleBadge role={inv.role} />
                   <button
                     onClick={() => handleRevokeInvite(inv.id)}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-rose-light text-mid hover:text-rose transition-colors shrink-0"
+                    className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-rose/10 text-mist hover:text-rose transition-colors shrink-0"
                     aria-label="Revoke invite"
                   >
                     <Trash2 size={14} />
@@ -375,8 +375,8 @@ export default function Circle() {
       )}
 
       {/* Role legend */}
-      <section className="bg-cream rounded-2xl p-4">
-        <h2 className="text-xs font-semibold text-mid uppercase tracking-wide mb-3">
+      <section className="bg-dawn rounded-card p-4">
+        <h2 className="text-xs font-semibold text-mist uppercase tracking-wide mb-3">
           Role Permissions
         </h2>
         <div className="space-y-2.5">
@@ -393,7 +393,7 @@ export default function Circle() {
                   <Icon size={11} />
                   {meta.label}
                 </span>
-                <p className="text-xs text-mid leading-relaxed">{desc}</p>
+                <p className="text-xs text-mist leading-relaxed">{desc}</p>
               </div>
             )
           })}

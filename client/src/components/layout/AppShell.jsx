@@ -19,7 +19,7 @@ function ShellInner() {
       if (entry.author_id !== user?.id) {
         toast('New care log entry added', {
           icon: '📝',
-          style: { background: '#2c2c2c', color: '#f7f4ef' },
+          style: { background: '#152435', color: '#e8f2f8' },
         })
       }
     },
@@ -29,7 +29,7 @@ function ShellInner() {
   })
 
   return (
-    <div className="flex h-screen overflow-hidden bg-cream">
+    <div className="flex h-screen overflow-hidden bg-dawn">
       <Sidebar />
       <div className="flex flex-col flex-1 min-w-0">
         <TopBar />
@@ -47,8 +47,11 @@ export default function AppShell() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-sage border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-gradient-night flex items-center justify-center">
+        <div className="text-center">
+          <p className="font-display text-2xl text-cloud mb-6 tracking-wide">The CareCircle</p>
+          <div className="w-8 h-8 border-2 border-mist border-t-transparent rounded-full animate-spin mx-auto" />
+        </div>
       </div>
     )
   }

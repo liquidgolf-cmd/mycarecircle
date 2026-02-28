@@ -12,14 +12,18 @@ export default function TopBar() {
     : '?'
 
   return (
-    <header className="h-14 bg-white border-b border-border flex items-center justify-between px-4 lg:px-6 shrink-0">
-      {/* Logo — hide text on very small screens to give RecipientSwitcher room */}
+    <header className="h-14 bg-dusk flex items-center justify-between px-4 lg:px-6 shrink-0">
+      {/* Wordmark */}
       <button
         onClick={() => navigate('/home')}
-        className="flex items-center gap-2 text-sage font-semibold text-base shrink-0"
+        className="shrink-0 leading-none"
       >
-        <span className="text-xl">🌿</span>
-        <span className="hidden sm:inline">My Care Circle</span>
+        <span className="font-display text-lg text-cloud font-medium tracking-wide hidden sm:inline">
+          The CareCircle
+        </span>
+        <span className="font-display text-lg text-cloud font-medium tracking-wide sm:hidden">
+          TC
+        </span>
       </button>
 
       {/* Recipient switcher — centered */}
@@ -29,14 +33,14 @@ export default function TopBar() {
       <div className="flex items-center gap-2">
         <button
           aria-label="Notifications"
-          className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-cream transition-colors text-mid"
+          className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-twilight/60 transition-colors text-mist"
         >
           <Bell size={20} />
         </button>
         <button
           aria-label="Account"
           onClick={() => navigate('/settings')}
-          className="w-9 h-9 flex items-center justify-center rounded-full bg-sage-lighter text-sage font-semibold text-sm hover:bg-sage-light hover:text-white transition-colors"
+          className="w-9 h-9 flex items-center justify-center rounded-full bg-twilight text-cloud font-semibold text-sm hover:bg-horizon transition-colors"
         >
           {initials}
         </button>

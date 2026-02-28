@@ -16,13 +16,12 @@ const CATEGORIES = [
 ]
 
 const SEVERITIES = [
-  { value: 'normal',     label: 'Normal',     color: 'text-mid' },
+  { value: 'normal',     label: 'Normal',     color: 'text-mist' },
   { value: 'concerning', label: 'Concerning', color: 'text-amber' },
   { value: 'urgent',     label: 'Urgent',     color: 'text-rose' },
 ]
 
-// This component is used both as a standalone page (/log/new)
-// and embedded inside a Modal when editing from Log.jsx
+// Used both as a standalone page (/log/new) and embedded in a Modal when editing
 export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
   const { recipient } = useCircle()
   const navigate = useNavigate()
@@ -86,7 +85,7 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
     <div className="space-y-5">
       {/* Category */}
       <div>
-        <label className="block text-xs font-medium text-mid mb-2 uppercase tracking-wide">Category</label>
+        <label className="block text-xs font-medium text-mist mb-2 uppercase tracking-wide">Category</label>
         <div className="grid grid-cols-5 gap-2">
           {CATEGORIES.map((cat) => (
             <button
@@ -96,7 +95,7 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
               className={`flex flex-col items-center gap-1 py-2.5 rounded-xl border text-xs font-medium transition-colors ${
                 category === cat.value
                   ? 'border-sage bg-sage text-white'
-                  : 'border-border bg-white text-mid hover:bg-cream'
+                  : 'border-cloud bg-white text-mist hover:bg-dawn'
               }`}
             >
               <span className="text-lg">{cat.icon}</span>
@@ -109,7 +108,7 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
       {/* Body */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label className="block text-xs font-medium text-mid uppercase tracking-wide">Note</label>
+          <label className="block text-xs font-medium text-mist uppercase tracking-wide">Note</label>
           <div className="flex items-center gap-3">
             <OcrButton
               mode="document"
@@ -117,7 +116,7 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
               label="Scan doc"
               className="text-xs text-sage font-medium hover:text-sage-light transition-colors"
             />
-            <span className={`text-xs ${body.length > 1900 ? 'text-rose' : 'text-mid'}`}>
+            <span className={`text-xs ${body.length > 1900 ? 'text-rose' : 'text-mist'}`}>
               {body.length}/2000
             </span>
           </div>
@@ -129,8 +128,8 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
             placeholder="What's happening with your loved one today?"
             maxLength={2000}
             rows={5}
-            className={`w-full rounded-xl border px-3 py-2.5 text-sm text-charcoal outline-none focus:ring-2 focus:ring-sage resize-none transition-colors ${
-              isListening ? 'border-rose' : 'border-border'
+            className={`w-full rounded-xl border px-3 py-2.5 text-sm text-night outline-none focus:ring-2 focus:ring-sage resize-none transition-colors ${
+              isListening ? 'border-rose' : 'border-cloud'
             }`}
           />
           {isSupported && (
@@ -138,9 +137,7 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
               type="button"
               onClick={isListening ? stopListening : startListening}
               className={`absolute bottom-2.5 right-2.5 w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${
-                isListening
-                  ? 'bg-rose text-white'
-                  : 'bg-cream hover:bg-cream-dark text-mid'
+                isListening ? 'bg-rose text-white' : 'bg-dawn hover:bg-cloud text-mist'
               }`}
               aria-label={isListening ? 'Stop recording' : 'Start voice input'}
               title={isListening ? 'Tap to stop' : 'Tap to speak'}
@@ -149,9 +146,8 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
             </button>
           )}
         </div>
-        {/* Listening status banner */}
         {isListening && (
-          <div className="flex items-center gap-2 px-3 py-2 bg-rose/10 border border-rose/20 rounded-lg">
+          <div className="flex items-center gap-2 px-3 py-2 bg-rose/10 border border-rose/20 rounded-xl mt-1">
             <span className="flex gap-0.5 items-end h-4">
               <span className="w-1 bg-rose rounded-full animate-bounce" style={{ height: '60%', animationDelay: '0ms' }} />
               <span className="w-1 bg-rose rounded-full animate-bounce" style={{ height: '100%', animationDelay: '150ms' }} />
@@ -164,7 +160,7 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
 
       {/* Severity */}
       <div>
-        <label className="block text-xs font-medium text-mid mb-2 uppercase tracking-wide">Severity</label>
+        <label className="block text-xs font-medium text-mist mb-2 uppercase tracking-wide">Severity</label>
         <div className="flex gap-2">
           {SEVERITIES.map((s) => (
             <button
@@ -174,7 +170,7 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
               className={`flex-1 py-2 rounded-xl border text-sm font-medium transition-colors ${
                 severity === s.value
                   ? 'border-sage bg-sage text-white'
-                  : `border-border bg-white ${s.color} hover:bg-cream`
+                  : `border-cloud bg-white ${s.color} hover:bg-dawn`
               }`}
             >
               {s.label}
@@ -188,7 +184,7 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
         <button
           type="button"
           onClick={handleCancel}
-          className="flex-1 py-3 rounded-xl border border-border bg-white text-charcoal text-sm font-medium hover:bg-cream transition-colors"
+          className="flex-1 py-3 rounded-full border border-cloud bg-white text-night text-sm font-medium hover:bg-dawn transition-colors"
         >
           Cancel
         </button>
@@ -196,7 +192,7 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
           type="button"
           onClick={handleSave}
           disabled={saving || !body.trim()}
-          className="flex-1 py-3 rounded-xl bg-sage text-white text-sm font-medium hover:bg-sage-light disabled:opacity-50 transition-colors"
+          className="flex-1 py-3 rounded-full bg-gradient-sage text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
         >
           {saving ? 'Saving…' : isEditing ? 'Save Changes' : 'Add Entry'}
         </button>
@@ -204,11 +200,10 @@ export default function LogEntryForm({ existingEntry, onSaved, onCancel }) {
     </div>
   )
 
-  // Standalone page — wrap in a page shell
   if (isStandalone) {
     return (
       <div className="p-4 lg:p-6 max-w-lg mx-auto">
-        <h1 className="text-xl font-semibold text-charcoal mb-5">New Entry</h1>
+        <h1 className="text-xl font-semibold text-night mb-5">New Entry</h1>
         {content}
       </div>
     )

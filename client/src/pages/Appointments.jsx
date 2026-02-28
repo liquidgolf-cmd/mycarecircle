@@ -14,13 +14,6 @@ function formatTime(iso) {
   return new Date(iso).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
 }
 
-function formatDateTimeLocal(iso) {
-  // Convert ISO string to "YYYY-MM-DDTHH:mm" for datetime-local input
-  const d = new Date(iso)
-  const pad = (n) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
-
 function StatusBadge({ status }) {
   if (status === 'completed') {
     return (
@@ -31,7 +24,7 @@ function StatusBadge({ status }) {
   }
   if (status === 'cancelled') {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-cream text-mid">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-dawn text-mist">
         <X size={10} /> Cancelled
       </span>
     )
@@ -127,9 +120,9 @@ export default function Appointments() {
   if (!recipient) {
     return (
       <div className="p-6 flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <Calendar size={40} className="text-mid mb-4" />
-        <h2 className="text-lg font-semibold text-charcoal mb-2">No care circle yet</h2>
-        <p className="text-mid text-sm">Set up a circle first to start tracking appointments.</p>
+        <Calendar size={40} className="text-mist mb-4" />
+        <h2 className="text-lg font-semibold text-night mb-2">No care circle yet</h2>
+        <p className="text-mist text-sm">Set up a circle first to start tracking appointments.</p>
       </div>
     )
   }
@@ -140,12 +133,12 @@ export default function Appointments() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-charcoal">Appointments</h1>
-          <p className="text-sm text-mid mt-0.5">Caring for <strong>{recipient.full_name}</strong></p>
+          <h1 className="text-xl font-semibold text-night">Appointments</h1>
+          <p className="text-sm text-mist mt-0.5">Caring for <strong>{recipient.full_name}</strong></p>
         </div>
         <button
           onClick={() => { setShowForm((v) => !v); if (showForm) resetForm() }}
-          className="flex items-center gap-1.5 bg-sage text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-sage-light transition-colors"
+          className="flex items-center gap-1.5 bg-gradient-sage text-white px-4 py-2 rounded-full text-sm font-medium hover:opacity-90 transition-opacity shadow-sage"
         >
           <Plus size={15} />
           Add
@@ -154,60 +147,60 @@ export default function Appointments() {
 
       {/* Add form */}
       {showForm && (
-        <div className="bg-white rounded-2xl border border-border p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-charcoal mb-4">Schedule an appointment</h2>
+        <div className="bg-white rounded-card shadow-card p-5">
+          <h2 className="text-sm font-semibold text-night mb-4">Schedule an appointment</h2>
           <form onSubmit={handleAdd} className="space-y-3">
             <div>
-              <label className="block text-xs font-medium text-mid mb-1 uppercase tracking-wide">Title *</label>
+              <label className="block text-xs font-medium text-mist mb-1.5 uppercase tracking-wide">Title *</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Cardiology follow-up"
                 required
-                className="w-full rounded-lg border border-border px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sage"
+                className="w-full rounded-xl border border-cloud px-3 py-2.5 text-sm text-night outline-none focus:ring-2 focus:ring-sage"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-mid mb-1 uppercase tracking-wide">Date & Time *</label>
+              <label className="block text-xs font-medium text-mist mb-1.5 uppercase tracking-wide">Date & Time *</label>
               <input
                 type="datetime-local"
                 value={apptDate}
                 onChange={(e) => setApptDate(e.target.value)}
                 required
-                className="w-full rounded-lg border border-border px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sage"
+                className="w-full rounded-xl border border-cloud px-3 py-2.5 text-sm text-night outline-none focus:ring-2 focus:ring-sage"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-mid mb-1 uppercase tracking-wide">Doctor / Provider</label>
+                <label className="block text-xs font-medium text-mist mb-1.5 uppercase tracking-wide">Doctor / Provider</label>
                 <input
                   type="text"
                   value={doctor}
                   onChange={(e) => setDoctor(e.target.value)}
                   placeholder="Dr. Smith"
-                  className="w-full rounded-lg border border-border px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sage"
+                  className="w-full rounded-xl border border-cloud px-3 py-2.5 text-sm text-night outline-none focus:ring-2 focus:ring-sage"
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-mid mb-1 uppercase tracking-wide">Location</label>
+                <label className="block text-xs font-medium text-mist mb-1.5 uppercase tracking-wide">Location</label>
                 <input
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="Clinic or address"
-                  className="w-full rounded-lg border border-border px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sage"
+                  className="w-full rounded-xl border border-cloud px-3 py-2.5 text-sm text-night outline-none focus:ring-2 focus:ring-sage"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-mid mb-1 uppercase tracking-wide">
+              <label className="block text-xs font-medium text-mist mb-1.5 uppercase tracking-wide">
                 Assign to a circle member
               </label>
               <select
                 value={assigneeId}
                 onChange={(e) => setAssigneeId(e.target.value)}
-                className="w-full rounded-lg border border-border px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sage bg-white"
+                className="w-full rounded-xl border border-cloud px-3 py-2.5 text-sm text-night outline-none focus:ring-2 focus:ring-sage bg-white"
               >
                 <option value="">No one assigned</option>
                 {members.map((m) => (
@@ -216,27 +209,27 @@ export default function Appointments() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-mid mb-1 uppercase tracking-wide">Notes</label>
+              <label className="block text-xs font-medium text-mist mb-1.5 uppercase tracking-wide">Notes</label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Bring insurance card, fasting required, etc."
                 rows={2}
-                className="w-full rounded-lg border border-border px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sage resize-none"
+                className="w-full rounded-xl border border-cloud px-3 py-2.5 text-sm text-night outline-none focus:ring-2 focus:ring-sage resize-none"
               />
             </div>
             <div className="flex gap-2 pt-1">
               <button
                 type="button"
                 onClick={resetForm}
-                className="flex-1 py-2.5 rounded-xl border border-border text-sm font-medium text-charcoal hover:bg-cream transition-colors"
+                className="flex-1 py-2.5 rounded-full border border-cloud text-sm font-medium text-night hover:bg-dawn transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={saving || !title.trim() || !apptDate}
-                className="flex-1 py-2.5 rounded-xl bg-sage text-white text-sm font-medium hover:bg-sage-light disabled:opacity-50 transition-colors"
+                className="flex-1 py-2.5 rounded-full bg-gradient-sage text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
               >
                 {saving ? 'Saving…' : 'Schedule'}
               </button>
@@ -247,20 +240,20 @@ export default function Appointments() {
 
       {/* Upcoming */}
       <section>
-        <h2 className="text-xs font-semibold text-mid uppercase tracking-wide mb-3">
+        <h2 className="text-xs font-semibold text-mist uppercase tracking-wide mb-3">
           Upcoming ({upcoming.length})
         </h2>
 
         {loading ? (
           <div className="space-y-3">
             {[1, 2].map((i) => (
-              <div key={i} className="h-24 bg-white rounded-2xl border border-border animate-pulse" />
+              <div key={i} className="h-24 bg-white rounded-card shadow-card animate-pulse" />
             ))}
           </div>
         ) : upcoming.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-border p-8 text-center">
-            <Calendar size={28} className="text-mid mx-auto mb-2" />
-            <p className="text-sm text-mid">No upcoming appointments</p>
+          <div className="bg-white rounded-card shadow-card p-8 text-center">
+            <Calendar size={28} className="text-mist mx-auto mb-2" />
+            <p className="text-sm text-mist">No upcoming appointments</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -282,7 +275,7 @@ export default function Appointments() {
         <section>
           <button
             onClick={() => setShowPast((v) => !v)}
-            className="flex items-center gap-2 text-xs font-semibold text-mid uppercase tracking-wide mb-3 w-full text-left"
+            className="flex items-center gap-2 text-xs font-semibold text-mist uppercase tracking-wide mb-3 w-full text-left"
           >
             Past ({past.length})
             {showPast ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -309,15 +302,15 @@ function AppointmentCard({ appt, onStatus, onDelete, showActions }) {
   const isPast = appt.status !== 'upcoming'
 
   return (
-    <div className={`bg-white rounded-2xl border px-4 py-4 ${isPast ? 'border-border opacity-70' : 'border-border shadow-sm'}`}>
+    <div className={`bg-white rounded-card shadow-card px-4 py-4 ${isPast ? 'opacity-70' : ''}`}>
       <div className="flex items-start gap-3">
 
         {/* Date block */}
-        <div className={`shrink-0 rounded-xl px-3 py-2 text-center min-w-[52px] ${isPast ? 'bg-cream' : 'bg-sage/10'}`}>
-          <p className={`text-xs font-semibold uppercase leading-none ${isPast ? 'text-mid' : 'text-sage'}`}>
+        <div className={`shrink-0 rounded-xl px-3 py-2 text-center min-w-[52px] ${isPast ? 'bg-dawn' : 'bg-sage/10'}`}>
+          <p className={`text-xs font-semibold uppercase leading-none ${isPast ? 'text-mist' : 'text-sage'}`}>
             {new Date(appt.appt_date).toLocaleString('en-US', { month: 'short' })}
           </p>
-          <p className={`text-xl font-bold leading-tight ${isPast ? 'text-mid' : 'text-sage'}`}>
+          <p className={`text-xl font-bold leading-tight ${isPast ? 'text-mist' : 'text-sage'}`}>
             {new Date(appt.appt_date).getDate()}
           </p>
         </div>
@@ -325,57 +318,57 @@ function AppointmentCard({ appt, onStatus, onDelete, showActions }) {
         {/* Details */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <p className="text-sm font-semibold text-charcoal leading-snug">{appt.title}</p>
+            <p className="text-sm font-semibold text-night leading-snug">{appt.title}</p>
             <StatusBadge status={appt.status} />
           </div>
 
           <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
-            <span className="flex items-center gap-1 text-xs text-mid">
+            <span className="flex items-center gap-1 text-xs text-mist">
               <Clock size={11} />
               {formatDate(appt.appt_date)} · {formatTime(appt.appt_date)}
             </span>
             {appt.doctor && (
-              <span className="flex items-center gap-1 text-xs text-mid">
+              <span className="flex items-center gap-1 text-xs text-mist">
                 <User size={11} /> {appt.doctor}
               </span>
             )}
             {appt.location && (
-              <span className="flex items-center gap-1 text-xs text-mid">
+              <span className="flex items-center gap-1 text-xs text-mist">
                 <MapPin size={11} /> {appt.location}
               </span>
             )}
           </div>
 
           {appt.assignee && (
-            <p className="mt-1 text-xs text-mid">
+            <p className="mt-1 text-xs text-mist">
               Assigned to <span className="font-medium text-sage">{appt.assignee.full_name}</span>
             </p>
           )}
 
           {appt.notes && (
-            <p className="mt-1.5 text-xs text-mid italic">{appt.notes}</p>
+            <p className="mt-1.5 text-xs text-mist italic">{appt.notes}</p>
           )}
         </div>
       </div>
 
       {/* Action buttons */}
       {showActions && (
-        <div className="flex gap-2 mt-3 pt-3 border-t border-border">
+        <div className="flex gap-2 mt-3 pt-3 border-t border-cloud">
           <button
             onClick={() => onStatus(appt.id, 'completed')}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-sage/10 text-sage text-xs font-semibold hover:bg-sage/20 transition-colors"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-sage/10 text-sage text-xs font-semibold hover:bg-sage/20 transition-colors"
           >
             <Check size={13} /> Mark Done
           </button>
           <button
             onClick={() => onStatus(appt.id, 'cancelled')}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-cream text-mid text-xs font-semibold hover:bg-cream-dark transition-colors"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-dawn text-mist text-xs font-semibold hover:bg-cloud transition-colors"
           >
             <X size={13} /> Cancel
           </button>
           <button
             onClick={() => onDelete(appt.id)}
-            className="w-9 flex items-center justify-center rounded-lg hover:bg-rose/10 text-mid hover:text-rose transition-colors"
+            className="w-9 flex items-center justify-center rounded-xl hover:bg-rose/10 text-mist hover:text-rose transition-colors"
             aria-label="Delete appointment"
           >
             <Trash2 size={14} />

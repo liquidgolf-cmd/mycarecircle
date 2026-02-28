@@ -19,7 +19,6 @@ export default function Login() {
   async function onSubmit(values) {
     try {
       await login(values)
-      // If arriving from an invite link, return there to accept it
       navigate(inviteToken ? `/invite/${inviteToken}` : '/home')
     } catch (err) {
       const msg = err.response?.data?.error || 'Invalid email or password.'
@@ -42,27 +41,29 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-cream flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen bg-gradient-night flex flex-col items-center justify-center px-6">
       <div className="w-full max-w-sm">
-        {/* Header */}
+
+        {/* Wordmark */}
         <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-sage rounded-xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white text-2xl">🌿</span>
-          </div>
-          <h1 className="text-2xl font-semibold text-charcoal">Welcome back</h1>
-          <p className="mt-1 text-mid text-sm">
-            {inviteToken
-              ? 'Sign in to accept your invitation.'
-              : 'Sign in to your My Care Circle account.'}
+          <button
+            onClick={() => navigate('/')}
+            className="font-display text-3xl text-cloud font-medium tracking-wide"
+          >
+            The CareCircle
+          </button>
+          <p className="mt-2 text-mist text-sm">
+            {inviteToken ? 'Sign in to accept your invitation.' : 'Welcome back.'}
           </p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-border p-6">
+        <div className="bg-white rounded-card shadow-card-md p-6">
+          <h2 className="text-lg font-semibold text-night mb-5">Sign In</h2>
           <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-            {/* Email */}
+
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-charcoal mb-1">
+              <label htmlFor="email" className="block text-xs font-medium text-mist mb-1.5 uppercase tracking-wide">
                 Email
               </label>
               <input
@@ -70,8 +71,8 @@ export default function Login() {
                 type="email"
                 autoComplete="email"
                 placeholder="jane@example.com"
-                className={`w-full rounded-lg border px-3 py-2.5 text-charcoal text-sm outline-none focus:ring-2 focus:ring-sage transition ${
-                  errors.email ? 'border-rose' : 'border-border'
+                className={`w-full rounded-xl border px-3 py-2.5 text-night text-sm outline-none focus:ring-2 focus:ring-sage transition ${
+                  errors.email ? 'border-rose' : 'border-cloud'
                 }`}
                 {...register('email', {
                   required: 'Email is required',
@@ -81,14 +82,11 @@ export default function Login() {
                   },
                 })}
               />
-              {errors.email && (
-                <p className="mt-1 text-xs text-rose">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="mt-1 text-xs text-rose">{errors.email.message}</p>}
             </div>
 
-            {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-charcoal mb-1">
+              <label htmlFor="password" className="block text-xs font-medium text-mist mb-1.5 uppercase tracking-wide">
                 Password
               </label>
               <input
@@ -96,14 +94,12 @@ export default function Login() {
                 type="password"
                 autoComplete="current-password"
                 placeholder="••••••••"
-                className={`w-full rounded-lg border px-3 py-2.5 text-charcoal text-sm outline-none focus:ring-2 focus:ring-sage transition ${
-                  errors.password ? 'border-rose' : 'border-border'
+                className={`w-full rounded-xl border px-3 py-2.5 text-night text-sm outline-none focus:ring-2 focus:ring-sage transition ${
+                  errors.password ? 'border-rose' : 'border-cloud'
                 }`}
                 {...register('password', { required: 'Password is required' })}
               />
-              {errors.password && (
-                <p className="mt-1 text-xs text-rose">{errors.password.message}</p>
-              )}
+              {errors.password && <p className="mt-1 text-xs text-rose">{errors.password.message}</p>}
             </div>
 
             <div className="flex justify-end">
@@ -119,18 +115,18 @@ export default function Login() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-sage text-white py-3 rounded-xl font-medium text-sm hover:bg-sage-light disabled:opacity-60 transition-colors"
+              className="w-full bg-gradient-sage text-white py-3 rounded-full font-medium text-sm hover:opacity-90 disabled:opacity-60 transition-opacity"
             >
               {isSubmitting ? 'Signing in…' : 'Sign In'}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-sm text-mid mt-4">
-          New to My Care Circle?{' '}
+        <p className="text-center text-sm text-mist mt-5">
+          New to The CareCircle?{' '}
           <Link
             to={inviteToken ? `/signup?invite=${inviteToken}` : '/signup'}
-            className="text-sage font-medium hover:underline"
+            className="text-cloud font-medium hover:underline"
           >
             Create an account
           </Link>
