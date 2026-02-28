@@ -1,6 +1,7 @@
 require('dotenv').config({ override: true })
 
 const express = require('express')
+const helmet = require('helmet')
 const cors = require('cors')
 const cron = require('node-cron')
 const { general: generalLimiter, ai: aiLimiter } = require('./middleware/rateLimit')
@@ -18,6 +19,9 @@ const { runWeeklyDigest } = require('./services/digest')
 
 const app = express()
 const PORT = process.env.PORT || 3001
+
+// Security headers
+app.use(helmet())
 
 // CORS — in production set FRONTEND_URL=https://mycarecircle.loamstrategy.com
 const allowedOrigins = [
