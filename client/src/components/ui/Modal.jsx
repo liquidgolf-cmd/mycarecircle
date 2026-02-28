@@ -11,6 +11,14 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
     return () => { document.body.style.overflow = '' }
   }, [isOpen])
 
+  // Close on Escape key
+  useEffect(() => {
+    if (!isOpen) return
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [isOpen, onClose])
+
   if (!isOpen) return null
 
   return (

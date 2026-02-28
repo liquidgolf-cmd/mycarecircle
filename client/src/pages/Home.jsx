@@ -4,6 +4,7 @@ import { Plus, Sparkles, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../context/AuthContext'
 import { useCircle } from '../context/CircleContext'
+import { useRealtime } from '../hooks/useRealtime'
 import api from '../services/api'
 import LogEntryCard from '../components/ui/LogEntryCard'
 
@@ -67,6 +68,20 @@ export default function Home() {
   }, [recipient])
 
   useEffect(() => { load() }, [load])
+
+  // Live updates — new entries and status changes from other circle members
+  useRealtime({
+    recipientId: recipient?.id,
+    onNewEntry: useCallback((entry) => {
+      // Ignore writes we made ourselves (already in local state)
+      if (entry.author_id === user?.id) return
+      setEntries((prev) => [entry, ...prev].slice(0, 5))
+      toast('New update from your circle', { icon: '🔔' })
+    }, [user?.id]),
+    onStatusChange: useCallback((status) => {
+      setTodayStatus(status)
+    }, []),
+  })
 
   async function handleCatchUp() {
     if (!recipient) return
