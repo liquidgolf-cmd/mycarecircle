@@ -1,6 +1,7 @@
 const express = require('express')
 const supabase = require('../services/supabase')
 const { requireAuth } = require('../middleware/auth')
+const { getMembership, getRecordAndMembership } = require('../middleware/membershipCheck')
 
 const router = express.Router()
 router.use(requireAuth)
@@ -9,6 +10,9 @@ router.use(requireAuth)
 router.get('/', async (req, res) => {
   const { recipient_id } = req.query
   if (!recipient_id) return res.status(400).json({ error: 'recipient_id is required' })
+
+  const membership = await getMembership(req.user.id, recipient_id)
+  if (!membership) return res.status(403).json({ error: 'Not a member of this care circle' })
 
   const { data, error } = await supabase
     .from('medications')
@@ -30,6 +34,10 @@ router.post('/', async (req, res) => {
   }
   if (name.length > 100) return res.status(400).json({ error: 'name must be 100 characters or fewer' })
   if (notes && notes.length > 500) return res.status(400).json({ error: 'notes must be 500 characters or fewer' })
+
+  const membership = await getMembership(req.user.id, recipient_id)
+  if (!membership) return res.status(403).json({ error: 'Not a member of this care circle' })
+  if (membership.role === 'viewer') return res.status(403).json({ error: 'Viewers cannot add medications' })
 
   const { data, error } = await supabase
     .from('medications')
@@ -79,6 +87,10 @@ router.patch('/:id', async (req, res) => {
     return res.status(400).json({ error: 'No valid fields to update' })
   }
 
+  const memberResult = await getRecordAndMembership(res, 'medications', req.params.id, req.user.id)
+  if (!memberResult) return
+  if (memberResult.membership.role === 'viewer') return res.status(403).json({ error: 'Viewers cannot modify medications' })
+
   const { data, error } = await supabase
     .from('medications')
     .update(updates)
@@ -116,12 +128,18 @@ router.patch('/:id', async (req, res) => {
 
 // DELETE /api/v1/medications/:id
 router.delete('/:id', async (req, res) => {
-  // Fetch name + recipient_id before deleting so we can write the log entry
+  // Fetch name + recipient_id before deleting (needed for auth check and log entry)
   const { data: med } = await supabase
     .from('medications')
     .select('name, recipient_id')
     .eq('id', req.params.id)
-    .single()
+    .maybeSingle()
+
+  if (!med) return res.status(404).json({ error: 'Medication not found' })
+
+  const membership = await getMembership(req.user.id, med.recipient_id)
+  if (!membership) return res.status(403).json({ error: 'Not a member of this care circle' })
+  if (membership.role !== 'admin') return res.status(403).json({ error: 'Admin role required to delete medications' })
 
   const { error } = await supabase
     .from('medications')

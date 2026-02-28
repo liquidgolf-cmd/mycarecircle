@@ -1,6 +1,7 @@
 const express = require('express')
 const supabase = require('../services/supabase')
 const { requireAuth } = require('../middleware/auth')
+const { getMembership } = require('../middleware/membershipCheck')
 
 const router = express.Router()
 router.use(requireAuth)
@@ -44,6 +45,9 @@ router.post('/upload-url', async (req, res) => {
 router.get('/', async (req, res) => {
   const { recipient_id } = req.query
   if (!recipient_id) return res.status(400).json({ error: 'recipient_id is required' })
+
+  const membership = await getMembership(req.user.id, recipient_id)
+  if (!membership) return res.status(403).json({ error: 'Not a member of this care circle' })
 
   const { data: docs, error } = await supabase
     .from('documents')
@@ -89,6 +93,10 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'recipient_id, file_name, mime_type, and storage_path are required' })
   }
 
+  const membership = await getMembership(req.user.id, recipient_id)
+  if (!membership) return res.status(403).json({ error: 'Not a member of this care circle' })
+  if (membership.role === 'viewer') return res.status(403).json({ error: 'Viewers cannot upload documents' })
+
   const { data: doc, error } = await supabase
     .from('documents')
     .insert({
@@ -111,12 +119,20 @@ router.post('/', async (req, res) => {
 // DELETE /api/v1/documents/:id
 // Remove the DB record and the file from Storage.
 router.delete('/:id', async (req, res) => {
-  // Fetch path before deleting so we can remove from Storage
+  // Fetch record before deleting (needed for membership check and Storage cleanup)
   const { data: doc } = await supabase
     .from('documents')
-    .select('storage_path')
+    .select('storage_path, recipient_id, uploaded_by')
     .eq('id', req.params.id)
-    .single()
+    .maybeSingle()
+
+  if (!doc) return res.status(404).json({ error: 'Document not found' })
+
+  const membership = await getMembership(req.user.id, doc.recipient_id)
+  if (!membership) return res.status(403).json({ error: 'Not a member of this care circle' })
+  if (membership.role !== 'admin' && doc.uploaded_by !== req.user.id) {
+    return res.status(403).json({ error: 'Only admins or the uploader can delete documents' })
+  }
 
   const { error } = await supabase
     .from('documents')

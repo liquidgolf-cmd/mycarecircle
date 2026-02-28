@@ -18,6 +18,7 @@ const documentsRoutes = require('./routes/documents')
 const { runWeeklyDigest } = require('./services/digest')
 
 const app = express()
+app.set('trust proxy', 1)   // trust first proxy (Railway's load balancer)
 const PORT = process.env.PORT || 3001
 
 // Security headers

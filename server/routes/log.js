@@ -1,6 +1,7 @@
 const express = require('express')
 const supabase = require('../services/supabase')
 const { requireAuth } = require('../middleware/auth')
+const { getMembership, getRecordAndMembership } = require('../middleware/membershipCheck')
 const { sendNewEntryEmail } = require('../services/email')
 
 const router = express.Router()
@@ -11,6 +12,9 @@ router.get('/', async (req, res) => {
   const { recipient_id, page = 1, limit = 20, category, search } = req.query
 
   if (!recipient_id) return res.status(400).json({ error: 'recipient_id is required' })
+
+  const membership = await getMembership(req.user.id, recipient_id)
+  if (!membership) return res.status(403).json({ error: 'Not a member of this care circle' })
 
   const pageNum = Math.max(1, parseInt(page))
   const limitNum = Math.min(50, Math.max(1, parseInt(limit)))
@@ -64,6 +68,10 @@ router.post('/', async (req, res) => {
   if (body.length > 2000) {
     return res.status(400).json({ error: 'body must be 2000 characters or fewer' })
   }
+
+  const membership = await getMembership(req.user.id, recipient_id)
+  if (!membership) return res.status(403).json({ error: 'Not a member of this care circle' })
+  if (membership.role === 'viewer') return res.status(403).json({ error: 'Viewers cannot create log entries' })
 
   const validCategories = ['health', 'medication', 'mood', 'appointment', 'general']
   if (!validCategories.includes(category)) {
@@ -147,11 +155,15 @@ router.patch('/:id', async (req, res) => {
     return res.status(400).json({ error: 'No fields to update' })
   }
 
+  // Verify circle membership; authors can only edit their own entries
+  const memberResult = await getRecordAndMembership(res, 'log_entries', id, req.user.id)
+  if (!memberResult) return
+
   const { data: entry, error } = await supabase
     .from('log_entries')
     .update(updates)
     .eq('id', id)
-    .eq('author_id', req.user.id) // server-side author check; RLS also enforces
+    .eq('author_id', req.user.id) // only the author may edit their own entry
     .select()
     .single()
 
@@ -163,11 +175,14 @@ router.patch('/:id', async (req, res) => {
 
 // DELETE /api/v1/log/:id
 router.delete('/:id', async (req, res) => {
+  const memberResult = await getRecordAndMembership(res, 'log_entries', req.params.id, req.user.id)
+  if (!memberResult) return
+
   const { error } = await supabase
     .from('log_entries')
     .delete()
     .eq('id', req.params.id)
-    .eq('author_id', req.user.id)
+    .eq('author_id', req.user.id) // only the author may delete their own entry
 
   if (error) return res.status(400).json({ error: error.message })
   return res.json({ message: 'Entry deleted' })

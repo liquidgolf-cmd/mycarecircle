@@ -1,6 +1,7 @@
 const express = require('express')
 const supabase = require('../services/supabase')
 const { requireAuth } = require('../middleware/auth')
+const { getMembership } = require('../middleware/membershipCheck')
 const { sendRedStatusEmail } = require('../services/email')
 
 const router = express.Router()
@@ -14,6 +15,9 @@ function todayUTC() {
 router.get('/today', async (req, res) => {
   const { recipient_id } = req.query
   if (!recipient_id) return res.status(400).json({ error: 'recipient_id is required' })
+
+  const membership = await getMembership(req.user.id, recipient_id)
+  if (!membership) return res.status(403).json({ error: 'Not a member of this care circle' })
 
   const { data, error } = await supabase
     .from('daily_status')
@@ -42,6 +46,10 @@ router.post('/', async (req, res) => {
   if (note && note.length > 500) {
     return res.status(400).json({ error: 'note must be 500 characters or fewer' })
   }
+
+  const membership = await getMembership(req.user.id, recipient_id)
+  if (!membership) return res.status(403).json({ error: 'Not a member of this care circle' })
+  if (membership.role === 'viewer') return res.status(403).json({ error: 'Viewers cannot submit a status check-in' })
 
   const date = status_date || todayUTC()
 
@@ -109,6 +117,9 @@ router.post('/', async (req, res) => {
 router.get('/history', async (req, res) => {
   const { recipient_id, days = 30 } = req.query
   if (!recipient_id) return res.status(400).json({ error: 'recipient_id is required' })
+
+  const membership = await getMembership(req.user.id, recipient_id)
+  if (!membership) return res.status(403).json({ error: 'Not a member of this care circle' })
 
   const daysNum = Math.min(90, Math.max(1, parseInt(days)))
   const since = new Date()

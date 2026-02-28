@@ -1,6 +1,7 @@
 const express = require('express')
 const supabase = require('../services/supabase')
 const { requireAuth } = require('../middleware/auth')
+const { getMembership, getRecordAndMembership } = require('../middleware/membershipCheck')
 const { sendAppointmentEmail } = require('../services/email')
 
 const router = express.Router()
@@ -11,6 +12,9 @@ router.use(requireAuth)
 router.get('/', async (req, res) => {
   const { recipient_id } = req.query
   if (!recipient_id) return res.status(400).json({ error: 'recipient_id is required' })
+
+  const membership = await getMembership(req.user.id, recipient_id)
+  if (!membership) return res.status(403).json({ error: 'Not a member of this care circle' })
 
   const { data, error } = await supabase
     .from('appointments')
@@ -48,6 +52,10 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'recipient_id, title, and appt_date are required' })
   }
   if (title.length > 200) return res.status(400).json({ error: 'title must be 200 characters or fewer' })
+
+  const membership = await getMembership(req.user.id, recipient_id)
+  if (!membership) return res.status(403).json({ error: 'Not a member of this care circle' })
+  if (membership.role === 'viewer') return res.status(403).json({ error: 'Viewers cannot create appointments' })
 
   const { data: appt, error } = await supabase
     .from('appointments')
@@ -136,6 +144,10 @@ router.patch('/:id', async (req, res) => {
     return res.status(400).json({ error: 'No valid fields to update' })
   }
 
+  const memberResult = await getRecordAndMembership(res, 'appointments', req.params.id, req.user.id)
+  if (!memberResult) return
+  if (memberResult.membership.role === 'viewer') return res.status(403).json({ error: 'Viewers cannot modify appointments' })
+
   const { data, error } = await supabase
     .from('appointments')
     .update(updates)
@@ -167,6 +179,10 @@ router.patch('/:id', async (req, res) => {
 
 // DELETE /api/v1/appointments/:id
 router.delete('/:id', async (req, res) => {
+  const memberResult = await getRecordAndMembership(res, 'appointments', req.params.id, req.user.id)
+  if (!memberResult) return
+  if (memberResult.membership.role === 'viewer') return res.status(403).json({ error: 'Viewers cannot delete appointments' })
+
   const { error } = await supabase
     .from('appointments')
     .delete()
