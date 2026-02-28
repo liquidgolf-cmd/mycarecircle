@@ -1,29 +1,36 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './context/AuthContext'
 import { CircleProvider } from './context/CircleContext'
 import AppShell from './components/layout/AppShell'
 
-// Public pages
-import Welcome from './pages/Welcome'
-import Signup from './pages/Signup'
-import Login from './pages/Login'
-import InviteAccept from './pages/InviteAccept'
+// Lazy-load every page so each route is a separate chunk.
+// AppShell stays eager — it's the layout wrapper, not a page.
+const Welcome     = lazy(() => import('./pages/Welcome'))
+const Signup      = lazy(() => import('./pages/Signup'))
+const Login       = lazy(() => import('./pages/Login'))
+const InviteAccept = lazy(() => import('./pages/InviteAccept'))
+const Onboarding  = lazy(() => import('./pages/Onboarding'))
+const Home        = lazy(() => import('./pages/Home'))
+const Log         = lazy(() => import('./pages/Log'))
+const LogNew      = lazy(() => import('./pages/LogNew'))
+const Medications = lazy(() => import('./pages/Medications'))
+const Status      = lazy(() => import('./pages/Status'))
+const Circle      = lazy(() => import('./pages/Circle'))
+const Appointments = lazy(() => import('./pages/Appointments'))
+const Documents   = lazy(() => import('./pages/Documents'))
+const Profile     = lazy(() => import('./pages/Profile'))
+const Settings    = lazy(() => import('./pages/Settings'))
 
-// Onboarding — full-screen, auth-guarded but no nav chrome
-import Onboarding from './pages/Onboarding'
-
-// Protected pages (inside AppShell with nav)
-import Home from './pages/Home'
-import Log from './pages/Log'
-import LogNew from './pages/LogNew'
-import Medications from './pages/Medications'
-import Status from './pages/Status'
-import Circle from './pages/Circle'
-import Appointments from './pages/Appointments'
-import Documents from './pages/Documents'
-import Profile from './pages/Profile'
-import Settings from './pages/Settings'
+// Minimal inline fallback — matches the page background so there's no flash
+function PageLoader() {
+  return (
+    <div className="min-h-screen bg-dawn flex items-center justify-center">
+      <div className="w-6 h-6 border-2 border-mist border-t-transparent rounded-full animate-spin" />
+    </div>
+  )
+}
 
 export default function App() {
   return (
@@ -45,36 +52,38 @@ export default function App() {
             error: { iconTheme: { primary: '#c47a7a', secondary: '#f7f4ef' } },
           }}
         />
-        <Routes>
-          {/* Public */}
-          <Route path="/welcome" element={<Welcome />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Public */}
+            <Route path="/welcome" element={<Welcome />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
 
-          {/* Invite acceptance — public landing page */}
-          <Route path="/invite/:token" element={<InviteAccept />} />
+            {/* Invite acceptance — public landing page */}
+            <Route path="/invite/:token" element={<InviteAccept />} />
 
-          {/* Onboarding — full-screen chat, no AppShell nav */}
-          <Route path="/onboarding" element={<Onboarding />} />
+            {/* Onboarding — full-screen chat, no AppShell nav */}
+            <Route path="/onboarding" element={<Onboarding />} />
 
-          {/* Protected — wrapped in AppShell (CircleProvider + nav) */}
-          <Route element={<AppShell />}>
-            <Route path="/home" element={<Home />} />
-            <Route path="/log" element={<Log />} />
-            <Route path="/log/new" element={<LogNew />} />
-            <Route path="/medications" element={<Medications />} />
-            <Route path="/status" element={<Status />} />
-            <Route path="/circle" element={<Circle />} />
-            <Route path="/appointments" element={<Appointments />} />
-            <Route path="/documents" element={<Documents />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/settings" element={<Settings />} />
-          </Route>
+            {/* Protected — wrapped in AppShell (CircleProvider + nav) */}
+            <Route element={<AppShell />}>
+              <Route path="/home" element={<Home />} />
+              <Route path="/log" element={<Log />} />
+              <Route path="/log/new" element={<LogNew />} />
+              <Route path="/medications" element={<Medications />} />
+              <Route path="/status" element={<Status />} />
+              <Route path="/circle" element={<Circle />} />
+              <Route path="/appointments" element={<Appointments />} />
+              <Route path="/documents" element={<Documents />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
 
-          {/* Root redirect */}
-          <Route path="/" element={<Navigate to="/welcome" replace />} />
-          <Route path="*" element={<Navigate to="/welcome" replace />} />
-        </Routes>
+            {/* Root redirect */}
+            <Route path="/" element={<Navigate to="/welcome" replace />} />
+            <Route path="*" element={<Navigate to="/welcome" replace />} />
+          </Routes>
+        </Suspense>
         </CircleProvider>
       </AuthProvider>
     </BrowserRouter>

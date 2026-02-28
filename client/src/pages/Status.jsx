@@ -116,6 +116,7 @@ export default function Status() {
               key={opt.value}
               onClick={() => canEdit && setSelected(opt.value)}
               disabled={!canEdit}
+              aria-pressed={isSelected}
               className={`w-full flex items-center gap-4 p-4 rounded-card border-2 transition-all ${
                 isSelected
                   ? `${opt.activeBg} ${opt.activeText} border-transparent shadow-card-md scale-[1.01]`
