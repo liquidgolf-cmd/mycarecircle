@@ -78,9 +78,17 @@ router.post('/login', async (req, res) => {
     return res.status(401).json({ error: error.message })
   }
 
+  // Fetch profile so the client doesn't need a separate /auth/me call after login
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', data.user.id)
+    .single()
+
   return res.json({
     user: data.user,
     session: data.session,
+    profile: profile || null,
   })
 })
 
