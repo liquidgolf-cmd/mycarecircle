@@ -47,6 +47,24 @@ router.post('/', async (req, res) => {
     .single()
 
   if (error) return res.status(400).json({ error: error.message })
+
+  // Auto-log: fire-and-forget — never fails the request
+  ;(async () => {
+    try {
+      const parts = [data.name]
+      if (data.dosage) parts.push(data.dosage)
+      if (data.frequency) parts.push(data.frequency)
+      if (data.prescribing_doctor) parts.push(`prescribed by ${data.prescribing_doctor}`)
+      await supabase.from('log_entries').insert({
+        recipient_id: data.recipient_id,
+        author_id: req.user.id,
+        category: 'medication',
+        body: `Added medication: ${parts.join(', ')}`,
+        severity: 'normal',
+      })
+    } catch { /* silent */ }
+  })()
+
   return res.status(201).json({ medication: data })
 })
 
@@ -70,17 +88,63 @@ router.patch('/:id', async (req, res) => {
 
   if (error) return res.status(400).json({ error: error.message })
   if (!data) return res.status(404).json({ error: 'Medication not found' })
+
+  // Auto-log: fire-and-forget
+  ;(async () => {
+    try {
+      let body
+      if (updates.is_active === false) {
+        body = `Discontinued medication: ${data.name}`
+      } else if (updates.is_active === true) {
+        body = `Restarted medication: ${data.name}`
+      } else {
+        const changed = Object.keys(updates).join(', ')
+        body = `Updated medication: ${data.name} (${changed} changed)`
+      }
+      await supabase.from('log_entries').insert({
+        recipient_id: data.recipient_id,
+        author_id: req.user.id,
+        category: 'medication',
+        body,
+        severity: 'normal',
+      })
+    } catch { /* silent */ }
+  })()
+
   return res.json({ medication: data })
 })
 
 // DELETE /api/v1/medications/:id
 router.delete('/:id', async (req, res) => {
+  // Fetch name + recipient_id before deleting so we can write the log entry
+  const { data: med } = await supabase
+    .from('medications')
+    .select('name, recipient_id')
+    .eq('id', req.params.id)
+    .single()
+
   const { error } = await supabase
     .from('medications')
     .delete()
     .eq('id', req.params.id)
 
   if (error) return res.status(400).json({ error: error.message })
+
+  // Auto-log: fire-and-forget
+  if (med) {
+    ;(async () => {
+      try {
+        await supabase.from('log_entries').insert({
+          recipient_id: med.recipient_id,
+          author_id: req.user.id,
+          category: 'medication',
+          body: `Removed medication: ${med.name}`,
+          severity: 'normal',
+        })
+      } catch { /* silent */ }
+    })()
+  }
+
   return res.json({ message: 'Medication deleted' })
 })
 
