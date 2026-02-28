@@ -20,6 +20,8 @@ import LogNew from './pages/LogNew'
 import Medications from './pages/Medications'
 import Status from './pages/Status'
 import Circle from './pages/Circle'
+import Appointments from './pages/Appointments'
+import Documents from './pages/Documents'
 import Profile from './pages/Profile'
 import Settings from './pages/Settings'
 
@@ -63,6 +65,8 @@ export default function App() {
             <Route path="/medications" element={<Medications />} />
             <Route path="/status" element={<Status />} />
             <Route path="/circle" element={<Circle />} />
+            <Route path="/appointments" element={<Appointments />} />
+            <Route path="/documents" element={<Documents />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
           </Route>

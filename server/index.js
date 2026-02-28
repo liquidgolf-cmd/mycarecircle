@@ -12,6 +12,8 @@ const logRoutes = require('./routes/log')
 const medicationsRoutes = require('./routes/medications')
 const statusRoutes = require('./routes/status')
 const aiRoutes = require('./routes/ai')
+const appointmentsRoutes = require('./routes/appointments')
+const documentsRoutes = require('./routes/documents')
 const { runWeeklyDigest } = require('./services/digest')
 
 const app = express()
@@ -61,6 +63,8 @@ app.use('/api/v1/log', logRoutes)
 app.use('/api/v1/medications', medicationsRoutes)
 app.use('/api/v1/status', statusRoutes)
 app.use('/api/v1/ai', aiRoutes)
+app.use('/api/v1/appointments', appointmentsRoutes)
+app.use('/api/v1/documents', documentsRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {

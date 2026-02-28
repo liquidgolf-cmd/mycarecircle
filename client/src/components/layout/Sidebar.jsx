@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Home, BookOpen, Pill, Activity, Users, User, Settings, LogOut } from 'lucide-react'
+import { Home, BookOpen, Pill, Activity, Users, Calendar, FileText, User, Settings, LogOut } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const navItems = [
@@ -8,6 +8,8 @@ const navItems = [
   { to: '/medications', label: 'Medications', Icon: Pill },
   { to: '/status', label: 'Daily Status', Icon: Activity },
   { to: '/circle', label: 'Care Circle', Icon: Users },
+  { to: '/appointments', label: 'Appointments', Icon: Calendar },
+  { to: '/documents', label: 'Documents', Icon: FileText },
   { to: '/profile', label: 'Profile', Icon: User },
   { to: '/settings', label: 'Settings', Icon: Settings },
 ]

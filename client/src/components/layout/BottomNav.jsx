@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { Home, BookOpen, Pill, Activity, Users } from 'lucide-react'
+import { Home, BookOpen, Pill, Activity, Users, Calendar } from 'lucide-react'
 
 const navItems = [
   { to: '/home', label: 'Home', Icon: Home },
   { to: '/log', label: 'Log', Icon: BookOpen },
   { to: '/medications', label: 'Meds', Icon: Pill },
+  { to: '/appointments', label: 'Appts', Icon: Calendar },
   { to: '/status', label: 'Status', Icon: Activity },
   { to: '/circle', label: 'Circle', Icon: Users },
 ]

@@ -153,4 +153,44 @@ async function sendRedStatusEmail({ to, memberName, authorName, recipientName, n
   })
 }
 
-module.exports = { sendEmail, sendInviteEmail, sendDigestEmail, sendNewEntryEmail, sendRedStatusEmail }
+// ── Appointment assignment notification ──────────────────────────────────────
+
+async function sendAppointmentEmail({ to, assigneeName, assignerName, recipientName, title, doctor, location, apptDate, notes }) {
+  const dateStr = new Date(apptDate).toLocaleString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  })
+
+  const details = []
+  if (doctor)   details.push(`<p style="margin:0 0 4px;color:#555"><strong>Provider:</strong> ${doctor}</p>`)
+  if (location) details.push(`<p style="margin:0 0 4px;color:#555"><strong>Location:</strong> ${location}</p>`)
+  if (notes)    details.push(`<p style="margin:0 0 4px;color:#555"><strong>Notes:</strong> ${notes}</p>`)
+
+  return sendEmail({
+    to,
+    subject: `Appointment assigned to you: ${title} for ${recipientName}`,
+    html: `
+      <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto;padding:24px;background:#f7f4ef;border-radius:16px">
+        <h2 style="color:#2c2c2c;margin:0 0 12px">📅 Appointment assigned to you</h2>
+        <p style="color:#666;line-height:1.6;margin:0 0 16px">
+          Hi ${assigneeName}, <strong>${assignerName}</strong> has assigned you to attend
+          an appointment for <strong>${recipientName}</strong>.
+        </p>
+        <div style="background:#fff;padding:20px;border-radius:12px;color:#2c2c2c;line-height:1.8">
+          <p style="margin:0 0 8px;font-size:17px;font-weight:600">${title}</p>
+          <p style="margin:0 0 4px;color:#555"><strong>When:</strong> ${dateStr}</p>
+          ${details.join('')}
+        </div>
+        <a href="${APP_URL}/appointments"
+           style="display:inline-block;margin-top:20px;background:#4a6e57;color:#fff;padding:10px 24px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">
+          View Appointments →
+        </a>
+        <p style="color:#999;font-size:12px;margin-top:20px;line-height:1.5">
+          You're receiving this because you're part of ${recipientName}'s care circle on My Care Circle.
+        </p>
+      </div>
+    `,
+  })
+}
+
+module.exports = { sendEmail, sendInviteEmail, sendDigestEmail, sendNewEntryEmail, sendRedStatusEmail, sendAppointmentEmail }
